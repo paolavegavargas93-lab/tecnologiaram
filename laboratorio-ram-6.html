@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Laboratorio RAM | Tecnología 6°</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070714;--p1:#0d0d22;--p2:#131330;--ln:#26264d;--cy:#00e5ff;--mg:#ff2bd6;--vi:#9d6bff;--ok:#38f59a;--bad:#ff5470;--am:#ffd166;--tx:#ecebff;--mu:#a6a6d4;--r:14px}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--tx);font:500 19px/1.45 'Rajdhani',system-ui,sans-serif;min-height:100vh;
+  background-image:linear-gradient(rgba(157,107,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(157,107,255,.05) 1px,transparent 1px);background-size:40px 40px;
+  padding-bottom:env(safe-area-inset-bottom,0px)}
+h1,h2,h3,h4{font-family:'Orbitron',sans-serif;font-weight:700;letter-spacing:.02em;margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:disabled{cursor:default}
+:focus-visible{outline:3px solid var(--mg);outline-offset:3px}
+.wrap{max-width:1080px;margin:0 auto;padding:18px 16px 60px}
+.btn{font-family:'Orbitron',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.04em;padding:.95em 1.4em;border-radius:10px;border:2px solid var(--cy);background:transparent;color:var(--cy);min-height:48px}
+.btn.pri{background:var(--cy);color:#04101a;box-shadow:0 0 18px rgba(0,229,255,.35)}
+.btn:disabled{opacity:.35}
+.btn:not(:disabled):hover{filter:brightness(1.15)}
+.link{background:none;border:0;color:var(--mu);font-weight:600;padding:8px 4px;text-decoration:underline;text-underline-offset:3px}
+.link:hover{color:var(--tx)}
+
+/* Ingreso */
+.login{max-width:560px;margin:0 auto;padding:calc(28px + env(safe-area-inset-top,0px)) 18px 40px;text-align:center}
+.sign{width:100%;height:auto;display:block}
+.flick{animation:flick 1.6s steps(1) 1 both}
+@keyframes flick{0%{opacity:.1}8%{opacity:1}12%{opacity:.2}20%{opacity:1}26%{opacity:.4}30%,100%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.flick{animation:none}}
+.lead{color:var(--mu);font-size:1.12rem;margin:18px auto 22px;max-width:44ch}
+.login-card{background:var(--p1);border:1px solid var(--ln);border-radius:var(--r);padding:22px;text-align:left;display:grid;gap:14px}
+.login-card label{display:grid;gap:6px;font-weight:700}
+input{font:inherit;font-size:1.1rem;color:var(--tx);background:#090920;border:2px solid var(--ln);border-radius:10px;padding:12px 14px;min-height:50px;width:100%}
+input:focus{border-color:var(--cy);outline:none;box-shadow:0 0 0 3px rgba(0,229,255,.25)}
+.lmsg{margin:0;color:var(--am);min-height:1.4em;font-size:1rem}
+.pie{color:#6f6fa0;font-size:.88rem;margin-top:22px}
+
+/* Barra superior */
+.hud{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;background:#0a0a1c;border-bottom:1px solid var(--ln)}
+.hud-marca{font-family:'Orbitron',sans-serif;font-weight:900;color:var(--cy);text-shadow:0 0 10px rgba(0,229,255,.6);font-size:.95rem;margin-right:auto}
+.hud-user{display:flex;flex-direction:column;line-height:1.1}
+.hud-user span{color:var(--mu);font-size:.85rem}
+.hud-coins{display:flex;align-items:center;gap:6px;font-family:'Orbitron',sans-serif;font-weight:700;color:var(--am)}
+.hud-coins svg{width:22px;height:22px}
+.save{font-size:.88rem;display:flex;align-items:center;gap:6px;color:var(--mu);font-weight:600}
+.save::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--ok);flex:none}
+.save.saving::before{background:var(--am)}
+.save.error{color:var(--bad)}.save.error::before{background:var(--bad)}
+.save.demo::before{background:var(--vi)}
+.icon-btn{background:var(--p2);border:1px solid var(--ln);border-radius:8px;padding:6px 12px;min-height:40px;font-weight:700}
+
+/* Mostrador y burbujas */
+.mostrador,.escena{display:grid;grid-template-columns:130px 1fr;gap:18px;align-items:end;margin:10px 0 20px}
+.escena{grid-template-columns:160px 1fr;margin:20px 0}
+.ava{width:100%;height:auto;display:block}
+.burbuja{position:relative;background:var(--p2);border:2px solid var(--vi);border-radius:18px;padding:14px 20px}
+.burbuja::before{content:"";position:absolute;left:-12px;bottom:26px;border:10px solid transparent;border-right-color:var(--vi);border-left:0}
+.burbuja p{margin:.2em 0 .8em;font-size:1.14rem;max-width:64ch}
+.burbuja p:last-child{margin-bottom:.2em}
+.quien{font-weight:700;color:var(--mg);font-size:.95rem}
+@media(max-width:600px){.mostrador,.escena{grid-template-columns:78px 1fr;gap:12px}}
+.prog{display:flex;align-items:center;gap:12px;color:var(--mu);font-weight:600;margin-bottom:24px}
+.bar{flex:1;height:10px;background:#15153a;border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--vi),var(--cy))}
+
+/* Estantes (misiones) */
+.sec-t{font-size:1rem;color:var(--mu);margin:0 0 12px}
+.estantes{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.estante{display:grid;gap:6px;text-align:left;background:var(--p1);border:1px solid var(--ln);border-bottom:6px solid var(--vi);border-radius:12px 12px 6px 6px;padding:16px}
+.est-ico{width:64px;height:64px;color:var(--cy)}
+.est-ico svg{width:100%;height:100%}
+.est-n{font-size:.88rem;color:var(--mu);font-weight:700}
+.est-t{font-family:'Orbitron',sans-serif;font-weight:700;font-size:.95rem;line-height:1.25}
+.est-c{color:var(--mu);font-size:.98rem}
+.est-bar{height:6px;background:#15153a;border-radius:4px;overflow:hidden}
+.est-bar i{display:block;height:100%;background:var(--cy)}
+.est-l{font-size:.92rem;font-weight:700;color:var(--cy)}
+.estante.hecha{border-bottom-color:var(--ok)}
+.estante.hecha .est-l,.estante.hecha .est-ico{color:var(--ok)}
+.estante.hecha .est-bar i{background:var(--ok)}
+.estante.cerrada{opacity:.45}
+.estante.cerrada .est-ico,.estante.cerrada .est-l{color:var(--mu)}
+.estante.abierta:hover,.estante.hecha:hover{border-color:var(--cy)}
+
+/* Barra de misión */
+.mbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-bottom:12px}
+.mbar-t{display:flex;flex-direction:column;margin-right:auto}
+.mbar-t span{color:var(--mu);font-size:.88rem;font-weight:700}
+.mbar-t b{font-family:'Orbitron',sans-serif;font-size:1rem}
+.dots{display:flex;gap:6px}
+.dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--ln)}
+.dot.cur{border-color:var(--cy);box-shadow:0 0 8px var(--cy)}
+.dot.ok{background:var(--ok);border-color:var(--ok)}
+.dot.mal{background:var(--bad);border-color:var(--bad)}
+
+/* Manual */
+.manual{background:var(--p1);border:1px solid var(--ln);border-left:6px solid var(--cy);border-radius:var(--r);padding:22px 24px}
+.man-head{display:flex;gap:16px;align-items:center;margin-bottom:10px}
+.man-ico{width:68px;height:68px;color:var(--cy);flex:none}
+.man-ico svg{width:100%;height:100%}
+.man-pag{color:var(--mu);font-size:.92rem;font-weight:700}
+.manual h2{font-size:1.2rem;color:var(--cy)}
+.manual p{font-size:1.17rem;max-width:66ch;margin:.6em 0}
+.fichas{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;margin:14px 0 0}
+.fichas div{background:var(--p2);border:1px solid var(--ln);border-radius:10px;padding:12px 14px}
+.fichas dt{font-family:'Orbitron',sans-serif;font-weight:700;color:var(--mg);font-size:.9rem;margin-bottom:4px}
+.fichas dd{margin:0;font-size:1.07rem}
+.acciones{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:12px;margin-top:18px}
+
+/* Retos */
+.reto-head{display:grid;grid-template-columns:96px 1fr;gap:16px;align-items:end;margin-bottom:16px}
+@media(max-width:600px){.reto-head{grid-template-columns:64px 1fr;gap:10px}}
+.zona{background:var(--p1);border:1px solid var(--ln);border-radius:var(--r);padding:18px}
+.ayuda{color:var(--mu);margin:0 0 12px;font-size:1.02rem}
+.ops{display:grid;gap:10px}
+.op{text-align:left;background:var(--p2);border:2px solid var(--ln);border-radius:12px;padding:14px 16px;font-size:1.13rem;font-weight:600;min-height:56px}
+.op:not(:disabled):hover{border-color:var(--vi)}
+.op.sel{border-color:var(--cy);box-shadow:0 0 0 3px rgba(0,229,255,.2)}
+.op.bien{border-color:var(--ok);background:rgba(56,245,154,.12)}
+.op.mal{border-color:var(--bad);background:rgba(255,84,112,.1);text-decoration:line-through;opacity:.7}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.col{display:grid;gap:10px;align-content:start}
+.mi{position:relative;text-align:left;background:var(--p2);border:2px solid var(--ln);border-radius:12px;padding:12px 12px 12px 48px;font-size:1.06rem;font-weight:600;min-height:56px}
+.mi .tag{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-family:'Orbitron',sans-serif;font-size:.75rem;border:2px solid var(--ln);color:var(--mu)}
+.mi.sel{border-color:var(--cy);box-shadow:0 0 0 3px rgba(0,229,255,.25)}
+.mi.par{border-color:var(--c)}
+.mi.par .tag{background:var(--c);border-color:var(--c);color:#06061a}
+.mi.bien{border-color:var(--ok)}
+.mi.bien .tag{background:var(--ok);border-color:var(--ok);color:#06061a}
+@media(max-width:560px){.mi{font-size:.98rem;padding-left:44px}.match{gap:8px}}
+.slots{list-style:none;padding:0;margin:0 0 16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.slot{width:100%;min-height:64px;display:flex;align-items:center;gap:10px;background:#0a0a1e;border:2px dashed var(--ln);border-radius:12px;padding:10px 12px;font-weight:700;font-size:1.06rem;text-align:left}
+.slot:not(.vacio){border-style:solid;border-color:var(--cy);background:var(--p2)}
+.slot.bien{border-color:var(--ok)}
+.sn{font-family:'Orbitron',sans-serif;font-size:.8rem;color:var(--mu)}
+.pool{display:flex;flex-wrap:wrap;gap:10px;min-height:56px}
+.chip{background:var(--p2);border:2px solid var(--vi);border-radius:999px;padding:10px 18px;font-weight:700;font-size:1.06rem;min-height:48px}
+.clasif{display:grid;gap:8px}
+.fila{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 14px;background:var(--p2);border:2px solid transparent;border-radius:12px;padding:10px 12px}
+.fila-t{font-weight:700;font-size:1.1rem}
+.fila.bien{border-color:var(--ok)}
+.fila.mal{border-color:var(--bad)}
+.seg{display:flex;gap:6px}
+.seg button{background:#0a0a1e;border:2px solid var(--ln);border-radius:9px;padding:8px 14px;font-weight:700;min-height:44px}
+.seg button.sel{border-color:var(--cy);background:rgba(0,229,255,.15);color:var(--cy)}
+.fila.bien .seg button.sel{border-color:var(--ok);color:var(--ok);background:rgba(56,245,154,.12)}
+.num{display:flex;align-items:center;gap:12px;font-family:'Orbitron',sans-serif;font-weight:700;color:var(--mu)}
+.num input{max-width:200px;font-family:'Orbitron',sans-serif;font-size:1.5rem;text-align:center}
+input.bien{border-color:var(--ok)}
+input.mal{border-color:var(--bad)}
+
+/* Armar pedido */
+.build{display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start}
+.grupo{border:0;padding:0;margin:0 0 14px;min-width:0}
+.grupo legend{font-family:'Orbitron',sans-serif;font-weight:700;color:var(--mg);font-size:.9rem;margin-bottom:8px;padding:0}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.pieza{display:grid;gap:2px;text-align:left;background:var(--p2);border:2px solid var(--ln);border-radius:10px;padding:10px 12px}
+.pieza b{font-size:1.06rem}
+.pieza small{color:var(--mu);font-size:.92rem}
+.pieza .precio{color:var(--am);font-weight:700}
+.pieza.sel{border-color:var(--cy);box-shadow:0 0 0 3px rgba(0,229,255,.2)}
+.resumen{background:#0a0a1e;border:2px solid var(--vi);border-radius:var(--r);padding:16px;position:sticky;top:80px}
+.resumen h3{font-size:.95rem;color:var(--vi);margin-bottom:10px}
+.resumen h4{font-size:.85rem;color:var(--mu);margin:14px 0 8px}
+.linea{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px dashed #22224a;font-size:1rem}
+.linea b{white-space:nowrap}
+.linea.total{font-size:1.15rem;color:var(--cy);border-bottom:2px solid var(--ln)}
+.linea.pasado{color:var(--bad)}
+.reqs{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.reqs li{padding-left:30px;position:relative}
+.reqs li::before{content:"?";position:absolute;left:0;top:1px;width:22px;height:22px;border-radius:50%;border:2px solid var(--ln);display:grid;place-items:center;font-size:.75rem;color:var(--mu)}
+.reqs li.ok::before{content:"✓";border-color:var(--ok);color:var(--ok)}
+.reqs li.no{color:var(--bad)}
+.reqs li.no::before{content:"✗";border-color:var(--bad);color:var(--bad)}
+@media(max-width:820px){.build{grid-template-columns:1fr}.resumen{position:static}}
+
+/* Retroalimentación */
+.fb{display:none;margin-top:14px;border-radius:12px;padding:14px 18px;font-size:1.1rem;border:2px solid}
+.fb.show{display:block}
+.fb.bien{border-color:var(--ok);background:rgba(56,245,154,.08)}
+.fb.mal{border-color:var(--bad);background:rgba(255,84,112,.08)}
+.fb.fin{border-color:var(--am);background:rgba(255,209,102,.08)}
+.fb.info{border-color:var(--vi);background:rgba(157,107,255,.08)}
+.fb b{font-family:'Orbitron',sans-serif;font-size:.88rem}
+.pista{color:var(--am)}
+.sol{display:block;margin:6px 0;color:var(--am);font-weight:700}
+.intentos{color:var(--mu);font-weight:600;margin-right:auto}
+
+/* Bloqueo por salir de la actividad */
+#bloqueo{position:fixed;inset:0;z-index:50;background:rgba(4,4,14,.95);display:grid;place-items:center;padding:20px}
+.bloq-card{max-width:520px;width:100%;background:var(--p1);border:2px solid var(--bad);border-radius:18px;padding:26px 22px;text-align:center;box-shadow:0 0 30px rgba(255,84,112,.35)}
+.bloq-ico{width:64px;height:64px;border-radius:50%;border:3px solid var(--bad);color:var(--bad);display:grid;place-items:center;margin:0 auto 12px;font-family:'Orbitron',sans-serif;font-weight:900;font-size:2rem}
+.bloq-card h2{color:var(--bad);font-size:1.15rem;margin-bottom:10px}
+.bloq-card p{font-size:1.12rem;margin:.5em 0}
+.bloq-card input{margin:12px 0 4px;text-align:center;font-family:'Orbitron',sans-serif}
+.bloq-msg{color:var(--am);min-height:1.4em}
+.hud-sal{font-weight:700;color:var(--mu);font-size:.9rem}
+.hud-sal.alerta{color:var(--bad)}
+.aviso{color:var(--am);font-weight:600;font-size:1.02rem !important}
+
+/* Laboratorios interactivos */
+.sim{margin-top:16px;background:#0d0d22;border:1px dashed var(--vi);border-radius:var(--r);padding:16px}
+.sim-btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+.sim-lab{color:var(--mu);font-weight:700}
+.sim-msg{margin:10px 0 4px;font-size:1.1rem;min-height:1.5em}
+.sim-msg.malo{color:var(--bad)}
+.chipbtn{background:var(--p2);border:2px solid var(--ln);border-radius:999px;padding:8px 14px;font-weight:700;min-height:44px}
+.chipbtn.sel{border-color:var(--cy);background:rgba(0,229,255,.15);color:var(--cy)}
+.apps{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.viaje{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:8px;align-items:center}
+.vj-caja{background:var(--p2);border:2px solid var(--ln);border-radius:12px;padding:12px 8px;text-align:center;display:grid;gap:4px;justify-items:center;transition:border-color .3s,box-shadow .3s}
+.vj-caja small{color:var(--mu);font-size:.88rem;line-height:1.2}
+.vj-ico{width:44px;height:44px;color:var(--mu)} .vj-ico svg{width:100%;height:100%}
+.vj-caja.on{border-color:var(--cy);box-shadow:0 0 16px rgba(0,229,255,.4)} .vj-caja.on .vj-ico{color:var(--cy)}
+.vj-flecha{font-size:1.8rem;color:var(--ln);transition:color .3s} .vj-flecha.on{color:var(--mg)}
+@media(max-width:600px){.viaje{grid-template-columns:1fr}.vj-flecha{transform:rotate(90deg);justify-self:center}}
+.mesa-bar{display:flex;height:46px;border:2px solid var(--ln);border-radius:10px;overflow:hidden;background:#080816}
+.mesa-bar.pasado{border-color:var(--bad);box-shadow:0 0 14px rgba(255,84,112,.45)}
+.seg-ram{display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;color:#06061a;overflow:hidden;white-space:nowrap;border-right:2px solid #080816;transition:width .3s}
+.s0{background:#a6a6d4}.s1{background:var(--cy)}.s2{background:var(--mg)}.s3{background:var(--am)}.s4{background:var(--ok)}.s5{background:var(--vi)}
+.seg-ram.libre{background:transparent;color:var(--mu);font-weight:600}
+.mesa-bar.pasado .seg-ram:last-child{background:var(--bad)}
+.lab2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lab-zona{background:var(--p2);border:2px solid var(--cy);border-radius:12px;padding:12px;min-height:150px}
+.lab-zona.dura{border-color:var(--ok)}
+.lab-zona h4{font-size:.9rem;margin-bottom:6px;color:var(--cy)} .lab-zona.dura h4{color:var(--ok)}
+.lab-zona ul{margin:0;padding-left:20px}
+.vacio-txt{color:var(--mu);font-style:italic}
+@media(max-width:560px){.lab2{grid-template-columns:1fr}}
+.escalera{display:grid;gap:8px}
+.escalon{position:relative;text-align:left;background:var(--p2);border:2px solid var(--ln);border-radius:10px;padding:10px 14px;display:grid;gap:4px}
+.esc-bar{display:block;height:10px;width:var(--w);border-radius:5px;background:linear-gradient(90deg,var(--vi),var(--cy))}
+.esc-det{display:none;color:var(--mu)} .escalon.abierto{border-color:var(--cy)} .escalon.abierto .esc-det{display:block}
+.modulo-wrap{background:#0d0d22;border-radius:10px;padding:4px}
+.modulo{width:100%;height:auto;display:block}
+.parte{cursor:pointer;outline:none}
+.parte:hover > *,.parte:focus-visible > *{filter:brightness(1.35)}
+.parte.sel > *{filter:drop-shadow(0 0 6px #00e5ff) brightness(1.3)}
+.parte.bien > *{filter:drop-shadow(0 0 7px #38f59a) brightness(1.3)}
+.parte.mal > *{filter:drop-shadow(0 0 7px #ff5470)}
+.via{display:grid;grid-template-columns:auto 1fr auto;gap:0 10px;align-items:center}
+.via-lab{font-family:'Orbitron',sans-serif;font-weight:700;color:var(--cy);font-size:.85rem}
+.via .via-lab:first-child{grid-column:1;grid-row:1 / span 2}
+.via .via-lab:last-child{grid-column:3;grid-row:1 / span 2}
+.via .carril{grid-column:2}
+.carril{position:relative;height:34px;background:#1b1b33;border-top:2px dashed #3a3a66;border-bottom:2px dashed #3a3a66;overflow:hidden;margin:4px 0}
+.camion{position:absolute;top:4px;left:-10%;font-size:1.4rem;color:var(--am);animation:viaje 2.7s linear infinite}
+@keyframes viaje{to{left:105%}}
+@media (prefers-reduced-motion:reduce){.camion{animation:none;position:static}}
+.graf-wrap{max-width:520px}
+.grafico{width:100%;height:auto;display:block}
+.barra rect{fill:var(--vi);cursor:pointer;transition:fill .2s}
+.barra:hover rect,.barra:focus-visible rect{fill:var(--cy)}
+.barra.sel rect{fill:var(--mg)}
+.barra{outline:none}
+.b-val{fill:var(--tx);font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700}
+.b-lab{fill:var(--mu);font-size:11px;font-weight:700;font-family:'Rajdhani',sans-serif}
+.paso{display:grid;grid-template-columns:120px 1fr;gap:16px;align-items:center}
+.paso-ico{color:var(--cy);background:#0d0d22;border-radius:12px;padding:8px} .paso-ico svg{width:100%;height:auto;display:block}
+.paso h4{color:var(--cy);font-size:1rem;margin:4px 0}
+.paso p{font-size:1.12rem;margin:0}
+.paso-dots{margin:12px 0}
+@media(max-width:560px){.paso{grid-template-columns:80px 1fr}}
+
+/* Tienda de notas */
+.lista-precios{margin-bottom:22px}
+.precios{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:12px 0}
+.precio-nota{background:var(--p1);border:2px solid var(--ln);border-radius:12px;padding:10px 6px;text-align:center;opacity:.5}
+.precio-nota b{display:block;font-family:'Orbitron',sans-serif;font-size:1.3rem;color:var(--tx)}
+.precio-nota span{font-size:.92rem;color:var(--am);font-weight:700}
+.precio-nota.alcanza{opacity:1;border-color:var(--cy)}
+.precio-nota.mejor{border-color:var(--mg);box-shadow:0 0 16px rgba(255,43,214,.45)}
+.precios-nota{color:var(--mu);margin:0;font-size:1.02rem}
+@media(max-width:520px){.precios{grid-template-columns:repeat(3,1fr)}}
+
+/* Cierre y certificado */
+.stats{display:flex;flex-wrap:wrap;gap:12px;margin:10px 0}
+.stat{background:var(--p1);border:1px solid var(--ln);border-radius:12px;padding:12px 16px;min-width:170px}
+.stat b{display:block;font-family:'Orbitron',sans-serif;font-size:1.4rem;color:var(--cy)}
+.stat span{color:var(--mu);font-size:.98rem}
+.cert{background:var(--p1);border:2px solid var(--vi);border-radius:20px;padding:28px 22px;text-align:center;max-width:780px;margin:10px auto}
+.cert h1{font-size:1.15rem;color:var(--mg)}
+.cert .nombre{font-family:'Orbitron',sans-serif;font-size:1.3rem;margin:14px 0 2px}
+.cert .nota{font-family:'Orbitron',sans-serif;font-weight:900;font-size:clamp(3.5rem,14vw,6rem);line-height:1;color:var(--cy);text-shadow:0 0 22px rgba(0,229,255,.6);margin:16px 0 6px}
+.cert .rango{font-family:'Orbitron',sans-serif;color:var(--am);font-size:1.05rem}
+.cert .stats{justify-content:center}
+.tabla-wrap{overflow-x:auto;margin-top:18px}
+.tabla{width:100%;border-collapse:collapse;text-align:left}
+.tabla th,.tabla td{padding:8px 10px;border-bottom:1px solid var(--ln)}
+.tabla th{color:var(--mu);font-weight:700}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+'use strict';
+/* =========================================================
+   CONFIGURACIÓN
+   Pega entre las comillas la URL /exec del Apps Script.
+   Si se deja vacía, el OVA funciona en modo demo:
+   usuario demo, contraseña 1234 (no guarda en la hoja).
+   El usuario demo funciona SIEMPRE, también con la hoja conectada,
+   para que la profe pueda revisar el OVA sin afectar resultados.
+   ========================================================= */
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyPm4Vdzli7DxuE9CfQKQfQGIWqrobQFUwdSyYEZwGGU0dgBRclIRvUHf4NV_eV6m1x/exec';
+const PTS = [50000, 30000, 15000];   // salario (pesos) por resolver un reto en el 1.º, 2.º o 3.er intento
+
+/* ---------- Vigilancia: cambiar de pestaña, minimizar u otra ventana ---------- */
+const VIG = {
+  activa: true,          // false = desactiva toda la vigilancia
+  penalMonedas: 50000,   // pesos que se descuentan del salario por cada salida
+  segundosMinimos: 2,    // salidas más cortas que esto no cuentan
+  esperaSeg: 10,         // segundos que queda bloqueado al volver
+  maxSalidas: 5,         // con esta cantidad de salidas la actividad se bloquea
+  claveProfe: '7319'     // clave para desbloquear (cámbiala)
+};
+
+/* ---------- Utilidades ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => '$' + Number(n).toLocaleString('es-CO');
+const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+function shuffle(a){ a = a.slice(); for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+/* ---------- Íconos ---------- */
+const SV = 'viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
+const ICON = {
+  torre:`<svg ${SV}><rect x="18" y="4" width="28" height="56" rx="4"/><line x1="24" y1="14" x2="40" y2="14"/><line x1="24" y1="20" x2="40" y2="20"/><circle cx="32" cy="42" r="6"/><circle cx="32" cy="42" r="2"/><line x1="24" y1="54" x2="28" y2="54"/></svg>`,
+  ram:`<svg ${SV}><rect x="4" y="20" width="56" height="20" rx="2"/><rect x="9" y="25" width="8" height="10"/><rect x="21" y="25" width="8" height="10"/><rect x="35" y="25" width="8" height="10"/><rect x="47" y="25" width="8" height="10"/><path d="M8 40v6M14 40v6M20 40v6M26 40v6M38 40v6M44 40v6M50 40v6M56 40v6"/></svg>`,
+  disco:`<svg ${SV}><rect x="10" y="6" width="44" height="52" rx="4"/><circle cx="32" cy="28" r="14"/><circle cx="32" cy="28" r="3"/><path d="M45 47L35 31"/><circle cx="16" cy="12" r="1.2"/><circle cx="48" cy="52" r="1.2"/></svg>`,
+  cpu:`<svg ${SV}><rect x="16" y="16" width="32" height="32" rx="3"/><rect x="24" y="24" width="16" height="16" rx="1"/><path d="M24 16V8M32 16V8M40 16V8M24 56v-8M32 56v-8M40 56v-8M16 24H8M16 32H8M16 40H8M56 24h-8M56 32h-8M56 40h-8"/></svg>`,
+  gpu:`<svg ${SV}><rect x="4" y="16" width="52" height="28" rx="3"/><circle cx="20" cy="30" r="8"/><circle cx="40" cy="30" r="8"/><path d="M20 23v14M13 30h14M40 23v14M33 30h14"/><path d="M60 12v36M10 44v6h22v-6"/></svg>`,
+  movil:`<svg ${SV}><rect x="18" y="4" width="28" height="56" rx="5"/><line x1="28" y1="10" x2="36" y2="10"/><rect x="25" y="21" width="14" height="14" rx="2"/><path d="M29 21v-3M35 21v-3M29 35v3M35 35v3M25 26h-3M25 31h-3M39 26h3M39 31h3"/><circle cx="32" cy="52" r="2"/></svg>`,
+  rayo:`<svg ${SV}><rect x="8" y="14" width="48" height="36" rx="4"/><path d="M35 20l-9 13h8l-5 12 11-15h-8l5-10z"/><path d="M14 22h5M14 42h5"/></svg>`,
+  regla:`<svg ${SV}><rect x="4" y="22" width="56" height="20" rx="2"/><path d="M12 22v8M20 22v5M28 22v8M36 22v5M44 22v8M52 22v5"/></svg>`,
+  barras:`<svg ${SV}><path d="M8 56h48"/><rect x="12" y="38" width="8" height="18"/><rect x="24" y="28" width="8" height="28"/><rect x="36" y="18" width="8" height="38"/><rect x="48" y="8" width="8" height="48"/></svg>`,
+  llave:`<svg ${SV}><path d="M40 8a14 14 0 0 0-13 19L8 46l10 10 19-19a14 14 0 0 0 19-13l-8 8-8-2-2-8z"/></svg>`,
+  lupa:`<svg ${SV}><circle cx="26" cy="26" r="16"/><path d="M38 38l18 18"/><path d="M20 26h12M26 20v12"/></svg>`,
+  caja:`<svg ${SV}><path d="M8 20l24-12 24 12v26L32 58 8 46z"/><path d="M8 20l24 12 24-12M32 32v26"/><path d="M20 14l24 12v8"/></svg>`,
+  perif:`<svg ${SV}><rect x="6" y="8" width="40" height="28" rx="3"/><path d="M20 44h12M26 36v8"/><rect x="6" y="48" width="34" height="10" rx="2"/><path d="M50 30c4 0 8 3 8 9v8c0 6-4 9-8 9s-8-3-8-9v-8c0-6 4-9 8-9zM50 30v9"/></svg>`
+};
+const COIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 6.5v11M15 9.5c-.6-1-1.7-1.5-3-1.5-1.7 0-3 .9-3 2s1.3 1.7 3 2 3 .9 3 2-1.3 2-3 2c-1.3 0-2.4-.5-3-1.5"/></svg>';
+
+/* ---------- Avatares ---------- */
+const PELO = {
+  corto:'M36 46c0-14 10-22 24-22s24 8 24 22c-5-6-12-9-24-9s-19 3-24 9z',
+  largo:'M34 48c0-16 11-26 26-26s26 10 26 26v30c-5-2-8-7-8-13V50c-4-6-10-9-18-9s-14 3-18 9v15c0 6-3 11-8 13z',
+  mono:'M36 46c0-14 10-22 24-22s24 8 24 22c-5-6-12-9-24-9s-19 3-24 9zM60 8a8 8 0 1 1 0 16a8 8 0 1 1 0-16z',
+  calvo:'M36 54c0-7 1-11 3-14l4 1c-1 3-2 7-2 13zM84 54c0-7-1-11-3-14l-4 1c1 3 2 7 2 13z',
+  crespo:'M37 46a8 8 0 0 1 5-14a9 9 0 0 1 12-9a9 9 0 0 1 12 0a9 9 0 0 1 12 9a8 8 0 0 1 5 14c-6-5-13-8-23-8s-17 3-23 8z'
+};
+let avaN = 0;
+function avatar(c){
+  const id = 'av' + (avaN++);
+  return `<svg class="ava" viewBox="0 0 120 120" aria-hidden="true"><defs><clipPath id="${id}"><circle cx="60" cy="60" r="56"/></clipPath></defs>
+  <circle cx="60" cy="60" r="57" fill="#12122e" stroke="${c.aura || '#9d6bff'}" stroke-width="3"/>
+  <g clip-path="url(#${id})"><path d="M18 122c3-24 20-36 42-36s39 12 42 36z" fill="${c.ropa}"/><rect x="53" y="68" width="14" height="16" fill="${c.piel}"/>
+  <circle cx="60" cy="50" r="23" fill="${c.piel}"/><path d="${PELO[c.estilo] || PELO.corto}" fill="${c.pelo}"/>
+  <circle cx="51" cy="51" r="3" fill="#1b1030"/><circle cx="69" cy="51" r="3" fill="#1b1030"/>
+  <path d="M52 61q8 6 16 0" stroke="#1b1030" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  ${c.gafas ? '<g fill="none" stroke="#1b1030" stroke-width="2"><circle cx="51" cy="51" r="6.5"/><circle cx="69" cy="51" r="6.5"/><path d="M57.5 51h5"/></g>' : ''}</g></svg>`;
+}
+const JEFA = {nombre:'Don Julián', rol:'dueño de TecnoTienda', piel:'#c68a5c', pelo:'#e4e4ee', ropa:'#3b2a7a', estilo:'calvo', gafas:true, aura:'#00e5ff'};
+
+
+/* =========================================================
+   GRÁFICOS INTERACTIVOS DEL LABORATORIO
+   ========================================================= */
+const PARTES = [
+  ['chips', 'Chips de memoria', 'Los cuadros negros. Ahí se guardan los datos mientras trabajas; cada chip tiene millones de celdas diminutas.'],
+  ['contactos', 'Contactos dorados', 'La fila dorada de abajo. Conectan el módulo con la placa madre. Un módulo DDR4 o DDR5 de escritorio tiene 288.'],
+  ['muesca', 'Muesca', 'Un corte en la fila dorada que no está en el centro. Hace que el módulo entre en una sola posición y solo en ranuras de su mismo tipo.'],
+  ['etiqueta', 'Etiqueta', 'Dice la capacidad (GB), el tipo (DDR4 o DDR5) y la velocidad (por ejemplo, 6000 MT/s).'],
+  ['laterales', 'Muescas laterales', 'Los cortes de los lados. Ahí se enganchan los seguros de la ranura y hacen clic cuando el módulo queda bien puesto.'],
+  ['placa', 'Placa de circuito', 'La lámina verde que sostiene los chips y lleva por dentro las conexiones.']
+];
+
+function moduloSVG(o = {}){
+  const so = o.tipo === 'SODIMM', W = so ? 330 : 560, x0 = (600 - W) / 2, nChips = so ? 4 : 8;
+  const notchX = x0 + W * (o.notch || 0.44), fondo = o.fondo || '#0d0d22';
+  const chipW = so ? 56 : 52, gap = (W - 40 - nChips * chipW) / (nChips - 1);
+  let chips = '', pins = '';
+  for (let i = 0; i < nChips; i++) chips += `<rect x="${x0 + 20 + i * (chipW + gap)}" y="52" width="${chipW}" height="58" rx="3" fill="#15151f" stroke="#3a3a55"/>`;
+  for (let x = x0 + 14; x < x0 + W - 16; x += 7) if (Math.abs(x - notchX) > 9) pins += `<rect x="${x}" y="172" width="4" height="22" fill="#e6b422"/>`;
+  const hit = (p, shape) => o.interactivo ? `<g class="parte" data-p="${p}" tabindex="0" role="button" aria-label="${PARTES.find(x => x[0] === p)[1]}">${shape}</g>` : shape;
+  return `<svg class="modulo" viewBox="0 0 600 205" aria-hidden="${o.interactivo ? 'false' : 'true'}">
+    ${hit('placa', `<rect x="${x0}" y="30" width="${W}" height="166" rx="6" fill="#0f5a3a" stroke="#1d8a5c" stroke-width="2"/>`)}
+    ${hit('laterales', `<g><circle cx="${x0}" cy="118" r="9" fill="${fondo}"/><circle cx="${x0 + W}" cy="118" r="9" fill="${fondo}"/><rect x="${x0 - 14}" y="104" width="28" height="28" fill="transparent"/><rect x="${x0 + W - 14}" y="104" width="28" height="28" fill="transparent"/></g>`)}
+    ${hit('chips', `<g>${chips}</g>`)}
+    ${hit('etiqueta', `<g><rect x="${x0 + W - (so ? 170 : 250)}" y="122" width="${so ? 150 : 230}" height="34" rx="3" fill="#e9e7f5"/><text x="${x0 + W - (so ? 95 : 135)}" y="145" text-anchor="middle" font-family="Rajdhani, sans-serif" font-weight="700" font-size="17" fill="#1b1030">${o.etiqueta || '16 GB DDR5-6000'}</text></g>`)}
+    ${hit('contactos', `<g>${pins}<rect x="${x0 + 10}" y="168" width="${W - 20}" height="30" fill="transparent"/></g>`)}
+    ${hit('muesca', `<g><rect x="${notchX - 7}" y="176" width="14" height="22" fill="${fondo}"/><rect x="${notchX - 18}" y="162" width="36" height="40" fill="transparent"/></g>`)}
+  </svg>`;
+}
+
+const SIM = {
+  viaje(el){
+    el.innerHTML = `<div class="viaje">
+      <div class="vj-caja" id="vjDisco"><span class="vj-ico">${ICON.disco}</span><b>Disco</b><small>Aquí está guardado el juego</small></div>
+      <div class="vj-flecha" id="vjF1">➜</div>
+      <div class="vj-caja" id="vjRam"><span class="vj-ico">${ICON.ram}</span><b>RAM</b><small id="vjRamTxt">Vacía</small></div>
+      <div class="vj-flecha" id="vjF2">➜</div>
+      <div class="vj-caja" id="vjCpu"><span class="vj-ico">${ICON.cpu}</span><b>Procesador</b><small>Trabaja con lo que hay en la RAM</small></div>
+    </div>
+    <p class="sim-msg" id="vjMsg" role="status">Toca el botón para abrir un juego.</p>
+    <div class="sim-btns"><button class="btn pri" id="vjBtn">Abrir el juego</button></div>`;
+    const pasos = [
+      ['vjDisco', 'El juego está guardado en el disco, que es grande pero lento.'],
+      ['vjF1', 'Se copia del disco a la RAM. Este viaje es el que más tarda.'],
+      ['vjRam', 'Ahora el juego está en la RAM, la mesa de trabajo.'],
+      ['vjF2', 'El procesador toma los datos desde la RAM: ¡rapidísimo!'],
+      ['vjCpu', '¡El juego abrió! Mientras juegas, el procesador trabaja con la RAM, no con el disco.']];
+    let t = [];
+    $('#vjBtn', el).onclick = () => {
+      t.forEach(clearTimeout); t = [];
+      $$('.vj-caja, .vj-flecha', el).forEach(x => x.classList.remove('on'));
+      $('#vjRamTxt', el).textContent = 'Vacía';
+      pasos.forEach(([id, txt], i) => t.push(setTimeout(() => {
+        $('#' + id, el).classList.add('on'); $('#vjMsg', el).textContent = txt; SFX.tap();
+        if (id === 'vjRam') $('#vjRamTxt', el).textContent = 'Juego cargado';
+      }, i * 1100)));
+    };
+  },
+
+  mesa(el){
+    let cap = 8; const on = new Set();
+    function pintar(){
+      const sis = 3, usado = sis + [...on].reduce((s, i) => s + APPS[i][1], 0), pasado = usado > cap;
+      const seg = (gb, txt, cls) => `<span class="seg-ram ${cls}" style="width:${Math.min(gb, cap) / Math.max(cap, usado) * 100}%" title="${txt}">${gb >= 1 ? txt : ''}</span>`;
+      el.innerHTML = `<div class="sim-btns"><span class="sim-lab">RAM del computador:</span>${[4, 8, 16].map(c => `<button class="chipbtn ${c === cap ? 'sel' : ''}" data-cap="${c}">${c} GB</button>`).join('')}</div>
+        <div class="mesa-bar ${pasado ? 'pasado' : ''}" role="img" aria-label="Usados ${fD(usado)} de ${cap} GB">
+          ${seg(sis, 'Windows', 's0')}${[...on].map((i, k) => seg(APPS[i][1], APPS[i][0].split(' (')[0], 's' + (k % 5 + 1))).join('')}
+          ${usado < cap ? `<span class="seg-ram libre" style="width:${(cap - usado) / cap * 100}%">libre</span>` : ''}
+        </div>
+        <p class="sim-msg ${pasado ? 'malo' : ''}" role="status"><b>${fD(usado)} GB de ${cap} GB.</b> ${pasado ? '¡La mesa se llenó! El computador usa el disco como memoria extra y todo se pone lento.' : usado > cap * 0.85 ? 'Casi lleno: el computador empieza a ir más lento.' : 'Todo va rápido.'}</p>
+        <div class="apps">${APPS.map(([n, gb], i) => `<button class="chipbtn ${on.has(i) ? 'sel' : ''}" data-app="${i}" aria-pressed="${on.has(i)}">${n}: ${fD(gb)} GB</button>`).join('')}</div>`;
+      $$('[data-cap]', el).forEach(b => b.onclick = () => { cap = +b.dataset.cap; SFX.tap(); pintar(); });
+      $$('[data-app]', el).forEach(b => b.onclick = () => { const i = +b.dataset.app; on.has(i) ? on.delete(i) : on.add(i); SFX.tap(); pintar(); });
+    }
+    pintar();
+  },
+
+  apagar(el){
+    let ram = ['Título: Los volcanes'], disco = null, apagado = false;
+    const frases = ['Los volcanes son montañas con lava.', 'El Nevado del Ruiz está en Colombia.', 'La lava sale muy caliente.', 'Hay volcanes activos y dormidos.'];
+    function pintar(msg){
+      el.innerHTML = `<div class="lab2">
+        <div class="lab-zona"><h4>Mesa (RAM)</h4>${apagado ? '<p class="vacio-txt">Vacía: se fue la energía</p>' : `<ul>${ram.map(x => `<li>${x}</li>`).join('')}</ul>`}</div>
+        <div class="lab-zona dura"><h4>Alacena (disco)</h4>${disco ? `<ul>${disco.map(x => `<li>${x}</li>`).join('')}</ul>` : '<p class="vacio-txt">Todavía no has guardado</p>'}</div></div>
+        <p class="sim-msg" role="status">${msg}</p>
+        <div class="sim-btns"><button class="btn" id="apEsc">Escribir otra línea</button><button class="btn" id="apGua">Guardar (Ctrl + S)</button><button class="btn pri" id="apApa">${apagado ? 'Prender y abrir lo guardado' : 'Se va la luz'}</button></div>`;
+      $('#apEsc', el).disabled = apagado;
+      $('#apGua', el).disabled = apagado;
+      $('#apEsc', el).onclick = () => { ram.push(frases[(ram.length - 1) % frases.length]); SFX.tap(); pintar('Lo nuevo está solo en la RAM hasta que guardes.'); };
+      $('#apGua', el).onclick = () => { disco = ram.slice(); SFX.ok(); pintar('Guardado: ahora hay una copia en el disco.'); };
+      $('#apApa', el).onclick = () => {
+        if (!apagado){ apagado = true; ram = []; SFX.bad(); pintar(disco ? 'Se borró la RAM, pero lo guardado sigue en el disco.' : '¡Se perdió todo! No habías guardado.'); }
+        else { apagado = false; ram = disco ? disco.slice() : []; pintar(disco ? 'Al abrir el archivo, se copia otra vez del disco a la RAM.' : 'No hay nada que abrir: la tarea se perdió.'); }
+      };
+    }
+    pintar('Escribe algunas líneas, guarda cuando quieras y luego toca “Se va la luz”.');
+  },
+
+  escalera(el){
+    const U = [['Bit', 'Un 0 o un 1', 'Un bombillo: prendido o apagado'], ['Byte', '8 bits', 'Una letra'], ['Kilobyte (KB)', 'Unos 1.000 bytes', 'Una página de texto ocupa unos 2 KB'], ['Megabyte (MB)', 'Unos 1.000 KB', 'Una foto del celular ocupa unos 3 MB'], ['Gigabyte (GB)', 'Unos 1.000 MB', 'Una película ocupa unos 4 GB'], ['Terabyte (TB)', 'Unos 1.000 GB', 'Un disco grande guarda 1 o 2 TB']];
+    el.innerHTML = `<div class="escalera">${U.map(([n, v, e], i) => `<button class="escalon" data-i="${i}" style="--w:${30 + i * 14}%"><span class="esc-bar"></span><b>${n}</b><span class="esc-det">${v}. Ejemplo: ${e}.</span></button>`).join('')}</div>`;
+    $$('.escalon', el).forEach(b => b.onclick = () => { b.classList.toggle('abierto'); SFX.tap(); });
+  },
+
+  modulo(el){
+    el.innerHTML = `<div class="modulo-wrap">${moduloSVG({ interactivo:true })}</div><p class="sim-msg" id="moMsg" role="status">Toca una parte del módulo.</p>`;
+    const ver = g => { $$('.parte', el).forEach(x => x.classList.remove('sel')); g.classList.add('sel'); const p = PARTES.find(x => x[0] === g.dataset.p); $('#moMsg', el).innerHTML = `<b>${p[1]}:</b> ${p[2]}`; SFX.tap(); };
+    $$('.parte', el).forEach(g => { g.onclick = e => { e.stopPropagation(); ver(g); }; g.onkeydown = e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); ver(g); } }; });
+  },
+
+  muescas(el){
+    const T = {
+      'DDR4 escritorio': { o:{ notch:0.47, etiqueta:'16 GB DDR4-3200' }, t:'DIMM DDR4: 288 contactos. Mira dónde queda la muesca.' },
+      'DDR5 escritorio': { o:{ notch:0.43, etiqueta:'16 GB DDR5-6000' }, t:'DIMM DDR5: también 288 contactos, pero la muesca está en otro lugar. Por eso no se pueden mezclar.' },
+      'DDR5 portátil': { o:{ tipo:'SODIMM', notch:0.37, etiqueta:'16 GB DDR5' }, t:'SO-DIMM DDR5: casi la mitad de largo, para portátiles. Tiene 262 contactos.' }};
+    let k = 'DDR4 escritorio';
+    function pintar(){
+      el.innerHTML = `<div class="sim-btns">${Object.keys(T).map(n => `<button class="chipbtn ${n === k ? 'sel' : ''}" data-k="${n}">${n}</button>`).join('')}</div>
+        <div class="modulo-wrap">${moduloSVG(T[k].o)}</div><p class="sim-msg" role="status">${T[k].t}</p>`;
+      $$('[data-k]', el).forEach(b => b.onclick = () => { k = b.dataset.k; SFX.tap(); pintar(); });
+    }
+    pintar();
+  },
+
+  carriles(el){
+    let doble = false;
+    function pintar(){
+      const camiones = n => Array.from({ length:n }, (_, i) => `<span class="camion" style="animation-delay:${-i * 0.9}s">▮</span>`).join('');
+      el.innerHTML = `<div class="sim-btns"><button class="chipbtn ${!doble ? 'sel' : ''}" data-d="0">Un módulo: un canal</button><button class="chipbtn ${doble ? 'sel' : ''}" data-d="1">Dos módulos: doble canal</button></div>
+        <div class="via"><span class="via-lab">RAM</span><div class="carril">${camiones(3)}</div>${doble ? `<div class="carril">${camiones(3)}</div>` : ''}<span class="via-lab">CPU</span></div>
+        <p class="sim-msg" role="status">${doble ? '<b>Doble canal:</b> dos carriles al mismo tiempo. Pasan el doble de datos por segundo.' : '<b>Un canal:</b> un solo carril. Los datos tienen que hacer fila.'}</p>`;
+      $$('[data-d]', el).forEach(b => b.onclick = () => { doble = b.dataset.d === '1'; SFX.tap(); pintar(); });
+    }
+    pintar();
+  },
+
+  grafico(el){
+    const D = {
+      'Computadores': [['Tareas sencillas', 4, 'Lo mínimo: escribir y navegar con pocas pestañas.'], ['Estudiar y videos', 8, 'Estudiar, investigar, clases virtuales y videos.'], ['Videojuegos', 16, 'Juegos modernos y varios programas a la vez.'], ['Video y 3D', 32, 'Editar video, diseño 3D, transmitir mientras juegas.'], ['IA y profesional', 64, 'Inteligencia artificial, edición 8K, trabajo profesional.']],
+      'Celulares': [['Gama de entrada', 4, 'WhatsApp, llamadas, redes sociales.'], ['Gama de entrada alta', 6, 'Lo anterior y juegos sencillos.'], ['Gama media', 8, 'Juegos populares, buenas fotos, muchas apps.'], ['Gama alta', 12, 'Juegos pesados, video 4K, funciones de IA.'], ['Gama alta tope', 16, 'Lo más potente que hay en celulares.']]};
+    let k = 'Computadores';
+    function pintar(sel){
+      const d = D[k], max = Math.max(...d.map(x => x[1])), bw = 52, gap = 14, x0 = 20;
+      const barras = d.map(([n, gb], i) => { const h = gb / max * 140, x = x0 + i * (bw + gap); return `<g class="barra ${sel === i ? 'sel' : ''}" data-i="${i}" tabindex="0" role="button" aria-label="${n}: ${gb} GB">
+        <rect x="${x}" y="${170 - h}" width="${bw}" height="${h}" rx="4"/><text x="${x + bw / 2}" y="${164 - h}" text-anchor="middle" class="b-val">${gb} GB</text>
+        <text x="${x + bw / 2}" y="188" text-anchor="middle" class="b-lab">${n.split(' ')[0]}</text><text x="${x + bw / 2}" y="201" text-anchor="middle" class="b-lab">${n.split(' ').slice(1).join(' ')}</text></g>`; }).join('');
+      el.innerHTML = `<div class="sim-btns">${Object.keys(D).map(n => `<button class="chipbtn ${n === k ? 'sel' : ''}" data-k="${n}">${n}</button>`).join('')}</div>
+        <div class="graf-wrap"><svg class="grafico" viewBox="0 0 360 210" role="group" aria-label="RAM recomendada para ${k}">${barras}</svg></div>
+        <p class="sim-msg" role="status">${sel == null ? 'Toca una barra.' : `<b>${d[sel][0]}: ${d[sel][1]} GB.</b> ${d[sel][2]}`}</p>`;
+      $$('[data-k]', el).forEach(b => b.onclick = () => { k = b.dataset.k; SFX.tap(); pintar(); });
+      $$('.barra', el).forEach(g => { const f = () => { SFX.tap(); pintar(+g.dataset.i); }; g.onclick = f; g.onkeydown = e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); f(); } }; });
+    }
+    pintar();
+  },
+
+  pasos(el){
+    const P = [
+      ['Apaga y desconecta', 'Apaga el computador y desconecta el cable de energía. Nunca se instala con el equipo encendido.', ICON.rayo],
+      ['Descarga la estática', 'Toca una parte metálica sin pintura de la torre, o usa una manilla antiestática.', ICON.torre],
+      ['Abre los seguros', 'Empuja hacia afuera los seguros de los extremos de la ranura.', ICON.ram],
+      ['Alinea la muesca', 'Toma el módulo por los bordes, sin tocar lo dorado, y alinea su muesca con la de la ranura.', moduloSVG()],
+      ['Presiona hasta el clic', 'Empuja firme y parejo desde los dos extremos hasta que los seguros cierren con un clic.', ICON.ram],
+      ['Revisa en el sistema', 'Conecta, prende y revisa en Configuración → Sistema → Información que aparezca la nueva cantidad de RAM.', ICON.lupa]];
+    let i = 0;
+    function pintar(){
+      const [t, d, ico] = P[i];
+      el.innerHTML = `<div class="paso"><div class="paso-ico">${ico}</div><div><div class="man-pag">Paso ${i + 1} de ${P.length}</div><h4>${t}</h4><p>${d}</p></div></div>
+        <div class="dots paso-dots">${P.map((_, k) => `<i class="dot ${k < i ? 'ok' : k === i ? 'cur' : ''}"></i>`).join('')}</div>
+        <div class="sim-btns"><button class="btn" id="psA" ${i === 0 ? 'disabled' : ''}>Paso anterior</button><button class="btn pri" id="psS" ${i === P.length - 1 ? 'disabled' : ''}>Paso siguiente</button></div>`;
+      $('#psA', el).onclick = () => { if (i > 0){ i--; SFX.tap(); pintar(); } };
+      $('#psS', el).onclick = () => { if (i < P.length - 1){ i++; SFX.tap(); pintar(); } };
+    }
+    pintar();
+  }
+};
+
+/* ---------- Tipos de reto nuevos: mesa y zona ---------- */
+function retoMesa(z, r){
+  const on = new Set();
+  function pintar(){
+    const usado = r.sis + [...on].reduce((s, i) => s + APPS[i][1], 0), pasado = usado > r.cap;
+    z.innerHTML = `<p class="ayuda">Toca los programas para abrirlos o cerrarlos. RAM del computador: <b>${r.cap} GB</b>.</p>
+      <div class="mesa-bar ${pasado ? 'pasado' : ''}" role="img" aria-label="Usados ${fD(usado)} de ${r.cap} GB">
+        <span class="seg-ram s0" style="width:${Math.min(r.sis, r.cap) / Math.max(r.cap, usado) * 100}%">Windows</span>
+        ${[...on].map((i, k) => `<span class="seg-ram s${k % 5 + 1}" style="width:${APPS[i][1] / Math.max(r.cap, usado) * 100}%">${APPS[i][1] >= 1 ? APPS[i][0].split(' (')[0] : ''}</span>`).join('')}
+        ${usado < r.cap ? `<span class="seg-ram libre" style="width:${(r.cap - usado) / r.cap * 100}%">libre</span>` : ''}
+      </div>
+      <p class="sim-msg ${pasado ? 'malo' : ''}"><b>${fD(usado)} GB de ${r.cap} GB</b>${pasado ? ': te pasaste de la RAM.' : '.'}</p>
+      <div class="apps">${APPS.map(([n, gb], i) => `<button class="chipbtn ${on.has(i) ? 'sel' : ''}" data-app="${i}" aria-pressed="${on.has(i)}">${n}: ${fD(gb)} GB</button>`).join('')}</div>`;
+    $$('[data-app]', z).forEach(b => b.onclick = () => { if (R.done) return; const i = +b.dataset.app; on.has(i) ? on.delete(i) : on.add(i); SFX.tap(); pintar(); });
+  }
+  pintar();
+  R.check = () => {
+    if (!on.size){ info('Abre por lo menos un programa antes de revisar.'); return null; }
+    const usado = r.sis + [...on].reduce((s, i) => s + APPS[i][1], 0);
+    const falta = r.necesita.some(i => !on.has(i));
+    if (falta) return { ok:false, msg:'Te falta abrir algo que el cliente necesita.' };
+    if (usado > r.cap) return { ok:false, msg:'Te pasaste de la RAM: cierra lo que el cliente no necesita.' };
+    return { ok:true };
+  };
+  R.reveal = () => { on.clear(); r.necesita.forEach(i => on.add(i)); pintar(); };
+}
+function retoZona(z, r){
+  let sel = null;
+  z.innerHTML = `<p class="ayuda">Toca la parte en el dibujo y luego toca Revisar.</p><div class="modulo-wrap">${moduloSVG({ interactivo:true, fondo:'#0d0d22' })}</div>`;
+  const marcar = g => { if (R.done) return; $$('.parte', z).forEach(x => x.classList.remove('sel', 'mal')); g.classList.add('sel'); sel = g.dataset.p; SFX.tap(); };
+  $$('.parte', z).forEach(g => { g.onclick = e => { e.stopPropagation(); marcar(g); }; g.onkeydown = e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); marcar(g); } }; });
+  R.check = () => {
+    if (!sel){ info('Toca una parte del módulo antes de revisar.'); return null; }
+    const g = $(`.parte[data-p="${sel}"]`, z);
+    if (sel === r.ok){ g.classList.add('bien'); return { ok:true }; }
+    g.classList.remove('sel'); g.classList.add('mal');
+    return { ok:false, msg:`Tocaste: ${PARTES.find(x => x[0] === sel)[1]}.` };
+  };
+  R.reveal = () => { $$('.parte', z).forEach(x => x.classList.remove('sel', 'mal')); $(`.parte[data-p="${r.ok}"]`, z).classList.add('bien'); };
+}
+
+/* ---------- Este OVA no usa catálogo de piezas ---------- */
+const CAT = {};
+const APPS = [['Navegador (10 pestañas)', 2], ['Videollamada', 1], ['Música', 0.5], ['Minecraft', 3], ['Editor de fotos', 2], ['Juego moderno', 6]];
+
+/* =========================================================
+   CONTENIDO: Laboratorio RAM (grado sexto)
+   tipos: mcq | match | order | clasif | num | mesa | zona
+   ========================================================= */
+const MIS = [
+{
+  titulo:'¿Qué es la memoria RAM?', icono:'ram', cli:JEFA,
+  pedido:'Bienvenido al Laboratorio RAM. Hoy vas a conocer la pieza que más preguntan los clientes: la memoria RAM. Empecemos por lo básico: qué es y qué hace dentro del computador.',
+  gracias:'¡Muy bien! Ya sabes qué es la RAM y por qué el procesador la necesita.',
+  manual:[
+    {t:'RAM: memoria de acceso aleatorio', fig:'ram', p:[
+      'RAM son las siglas en inglés de <b>Random Access Memory</b>, que significa <b>memoria de acceso aleatorio</b>.',
+      '“Acceso aleatorio” quiere decir que puede ir directo a cualquier dato, sin recorrer todo lo demás, como cuando abres un libro justo en la página que necesitas.',
+      'La RAM es la <b>memoria de trabajo</b> del computador: ahí está todo lo que tienes abierto en este momento.']},
+    {t:'El viaje de un programa', fig:'ram', p:['Toca el botón y mira qué pasa cuando abres un juego:'], sim:'viaje'},
+    {t:'La cocina del computador', fig:'ram', p:['Imagina que el computador es una cocina:'], fichas:[
+      ['Procesador', 'El chef. Es el que trabaja: corta, mezcla y cocina (hace los cálculos).'],
+      ['Memoria RAM', 'La mesa de trabajo. Ahí pone los ingredientes que está usando ahora mismo.'],
+      ['Almacenamiento', 'La alacena. Ahí se guarda todo, aunque no se esté usando.'],
+      ['Programa abierto', 'Los ingredientes que están sobre la mesa.']]}
+  ],
+  retos:[
+    {tipo:'mcq', q:'¿Qué significa la sigla RAM?', ops:['Memoria de acceso aleatorio','Memoria de almacenamiento rápido','Red de archivos móviles','Ratón, audio y monitor'], ok:0,
+      pista:'Está en la primera página del manual: Random Access Memory.',
+      exp:'RAM = Random Access Memory = memoria de acceso aleatorio, porque puede ir directo a cualquier dato.'},
+    {tipo:'match', q:'Une cada parte del computador con su papel en la cocina.',
+      pares:[['Procesador','El chef que cocina'],['Memoria RAM','La mesa de trabajo'],['Almacenamiento','La alacena donde se guarda todo'],['Programa abierto','Los ingredientes sobre la mesa']],
+      pista:'¿Quién trabaja, dónde se pone lo que se usa y dónde se guarda todo?',
+      exp:'El chef (procesador) trabaja con lo que está en la mesa (RAM) y saca lo que necesita de la alacena (almacenamiento).'},
+    {tipo:'order', q:'Ordena lo que pasa cuando abres un juego.', items:['El juego está guardado en el disco','El juego se copia a la RAM','El procesador trabaja con el juego desde la RAM','Ves el juego en la pantalla'],
+      pista:'Repasa la animación de la segunda página del manual.',
+      exp:'Primero se copia del disco a la RAM, porque el procesador trabaja mucho más rápido con lo que está en la RAM.'},
+    {tipo:'mcq', q:'¿Por qué el procesador no trabaja directamente con lo que está guardado en el disco?',
+      ops:['Porque el disco es mucho más lento que la RAM','Porque el disco no tiene electricidad','Porque el disco solo guarda fotos','Porque el procesador no está conectado al disco'], ok:0,
+      pista:'Piensa en el chef: ¿cocina dentro de la alacena?',
+      exp:'La RAM es muchísimo más rápida que el disco. Por eso lo que se está usando se copia primero a la RAM.'}
+  ]
+},
+{
+  titulo:'La mesa se llena: capacidad', icono:'ram',
+  cli:{nombre:'Sofía', rol:'estudiante de grado sexto', piel:'#d49a6a', pelo:'#1d120c', ropa:'#2e7d5b', estilo:'largo', gafas:true},
+  pedido:'Cuando hago mis tareas abro el navegador, la videollamada con mi grupo y música, y el computador se pone lentísimo. ¿Por qué pasa eso?',
+  gracias:'¡Ahora entiendo! Mi mesa de trabajo se llenaba. Gracias.',
+  manual:[
+    {t:'¿Cuánto cabe en la mesa?', fig:'ram', p:[
+      'La capacidad de la RAM se mide en <b>GB (gigabytes)</b>. Entre más GB, más grande es la mesa y más programas caben abiertos al mismo tiempo.',
+      'El sistema operativo (por ejemplo, Windows) siempre ocupa una parte de la mesa, aunque no abras nada.',
+      'Los números de los programas de este laboratorio son aproximados: cada programa usa más o menos RAM según lo que estés haciendo.']},
+    {t:'Laboratorio: llena la mesa', fig:'ram', p:['Elige cuánta RAM tiene el computador y abre programas. Mira qué pasa cuando la mesa se llena:'], sim:'mesa'},
+    {t:'Cuando la mesa se llena', fig:'disco', p:[
+      'Si abres más de lo que cabe, el computador usa una parte del disco como mesa extra. A eso se le llama <b>memoria virtual</b>.',
+      'El problema es que el disco es mucho más lento que la RAM: todo se pone lento, los programas tardan en cambiar y a veces se congelan.',
+      'Soluciones: cerrar lo que no estás usando o ampliar la RAM.']}
+  ],
+  retos:[
+    {tipo:'num', q:'En un computador, Windows usa 3 GB, el navegador 2 GB y Minecraft 3 GB. ¿Cuántos GB de RAM se están usando en total?', ok:8, unidad:'GB',
+      pista:'Suma todo: 3 + 2 + 3.', exp:'3 + 2 + 3 = 8 GB. Si el computador tiene 8 GB, la mesa está completamente llena.'},
+    {tipo:'mesa', q:'Sofía tiene un computador de 8 GB. Windows ya ocupa 3 GB. Para su tarea necesita el navegador y la videollamada. Abre lo que necesita sin pasarte de la mesa.', cap:8, sis:3, necesita:[0, 1],
+      pista:'Abre lo que ella necesita y revisa que la barra no pase al rojo.',
+      exp:'3 + 2 + 1 = 6 GB: le quedan 2 GB libres. Si además abre Minecraft, se pasaría y todo iría lento.'},
+    {tipo:'mcq', q:'¿Qué pasa cuando abres más programas de los que caben en la RAM?',
+      ops:['El computador usa el disco como mesa extra y se pone lento','El computador se vuelve más rápido','La RAM crece sola','El monitor se apaga'], ok:0,
+      pista:'Revisa la página “Cuando la mesa se llena”.',
+      exp:'Eso se llama memoria virtual. Funciona, pero como el disco es lento, todo se demora.'},
+    {tipo:'mcq', q:'Verdadero o falso: con más GB de RAM caben más programas abiertos al mismo tiempo.', ops:['Verdadero','Falso'], ok:0,
+      pista:'Más GB = una mesa más grande.',
+      exp:'Verdadero. Por eso un computador con 16 GB aguanta muchas más cosas abiertas que uno de 4 GB.'}
+  ]
+},
+{
+  titulo:'La mesa se limpia: memoria volátil', icono:'rayo',
+  cli:{nombre:'Laura', rol:'estudiante de grado sexto', piel:'#f0c49c', pelo:'#7a3b17', ropa:'#c2185b', estilo:'largo'},
+  pedido:'Estuve dos horas haciendo una presentación, se fue la luz y cuando prendí el computador ya no estaba. ¿A dónde se fue mi trabajo?',
+  gracias:'Ahora guardo cada rato con Ctrl + S. ¡No me vuelve a pasar!',
+  manual:[
+    {t:'Volátil y no volátil', fig:'rayo', p:[
+      'La RAM es una memoria <b>volátil</b>: necesita electricidad para recordar. Cuando el computador se apaga, se reinicia o se va la luz, la RAM queda vacía.',
+      'El almacenamiento (disco duro, SSD, memoria USB, tarjeta microSD) es <b>no volátil</b>: guarda la información aunque no tenga electricidad.',
+      'Otras memorias volátiles: la <b>caché</b> que está dentro del procesador y la <b>VRAM</b> de la tarjeta gráfica.']},
+    {t:'Laboratorio: guardar o perder', fig:'rayo', p:['Escribe en tu tarea, guarda cuando quieras y apaga el computador. ¿Qué sobrevive?'], sim:'apagar'},
+    {t:'Guardar es pasar de la mesa a la alacena', fig:'disco', p:[
+      'Cuando escribes, lo nuevo está solo en la RAM. Cuando <b>guardas</b> (Ctrl + S), una copia pasa al almacenamiento.',
+      'Por eso hay que guardar seguido. Algunos programas tienen <b>autoguardado</b>, que guarda solo cada pocos minutos.']}
+  ],
+  retos:[
+    {tipo:'clasif', q:'Clasifica cada memoria: ¿se borra al apagar (volátil) o no (no volátil)?', cats:['Volátil','No volátil'],
+      items:[['Memoria RAM',0],['VRAM de la tarjeta gráfica',0],['Caché del procesador',0],['Disco SSD',1],['Memoria USB',1],['Tarjeta microSD',1]],
+      pista:'Las memorias de trabajo se borran; las de guardar, no.',
+      exp:'RAM, VRAM y caché son memorias de trabajo: volátiles. SSD, USB y microSD son para guardar: no volátiles.'},
+    {tipo:'mcq', q:'Laura escribió dos horas sin guardar y se fue la luz. ¿Qué pasó con su trabajo?',
+      ops:['Se perdió, porque solo estaba en la RAM','Se guardó solo en el monitor','Está escondido en el teclado','Sigue en la RAM esperando a que prenda'], ok:0,
+      pista:'¿Qué le pasa a la RAM sin electricidad?',
+      exp:'Lo que no se guardó solo existía en la RAM, y la RAM se vacía al quedarse sin energía.'},
+    {tipo:'mcq', q:'¿Qué debe hacer Laura para que no le vuelva a pasar?',
+      ops:['Guardar seguido (Ctrl + S) para pasar el trabajo al almacenamiento','Comprar un monitor más grande','Escribir más rápido','Desconectar el computador mientras trabaja'], ok:0,
+      pista:'Guardar = pasar de la mesa a la alacena.',
+      exp:'Al guardar, una copia queda en el almacenamiento, que no se borra al apagar.'},
+    {tipo:'mcq', q:'Verdadero o falso: cuando reinicias el computador, la RAM queda vacía.', ops:['Verdadero','Falso'], ok:0,
+      pista:'Reiniciar es apagar y volver a prender.',
+      exp:'Verdadero. Por eso reiniciar a veces “arregla” un computador lento: limpia la mesa.'}
+  ]
+},
+{
+  titulo:'Bits, bytes y gigabytes', icono:'regla',
+  cli:{nombre:'Camilo', rol:'tiene 12 años y le encantan los juegos', piel:'#e0ac82', pelo:'#3a2416', ropa:'#1f6f8b', estilo:'corto'},
+  pedido:'Todo el mundo habla de GB, MB y KB, pero no sé cuánto es cada uno. ¿Qué es más grande, un megabyte o un gigabyte?',
+  gracias:'¡Ya entiendo las unidades! Ahora sé cuánto ocupa cada cosa.',
+  manual:[
+    {t:'El bit y el byte', fig:'regla', p:[
+      'El computador guarda todo con dos señales: <b>0</b> y <b>1</b> (apagado y prendido). Cada 0 o 1 es un <b>bit</b>, la unidad más pequeña de información.',
+      '<b>8 bits forman 1 byte</b>. Con un byte se puede guardar, por ejemplo, una letra.']},
+    {t:'Laboratorio: la escalera de unidades', fig:'regla', p:['Toca cada escalón para ver cuánto es y un ejemplo:'], sim:'escalera'},
+    {t:'Cada escalón, unas mil veces más', fig:'regla', p:[
+      '1 kilobyte (KB) son unos 1.000 bytes; 1 megabyte (MB) son unos 1.000 KB; 1 gigabyte (GB) son unos 1.000 MB; 1 terabyte (TB) son unos 1.000 GB.',
+      'Dato curioso: los computadores en realidad cuentan de 1.024 en 1.024, pero para hacer cuentas rápidas usamos 1.000.']}
+  ],
+  retos:[
+    {tipo:'order', q:'Ordena las unidades de la más pequeña a la más grande.', items:['Bit','Byte','Kilobyte (KB)','Megabyte (MB)','Gigabyte (GB)'],
+      pista:'Empieza por el 0 o el 1.', exp:'Bit < byte < KB < MB < GB. Cada escalón es unas mil veces el anterior (menos del bit al byte, que son 8).'},
+    {tipo:'num', q:'1 byte tiene 8 bits. ¿Cuántos bits hay en 4 bytes?', ok:32, unidad:'bits',
+      pista:'Multiplica: 4 × 8.', exp:'4 × 8 = 32 bits.'},
+    {tipo:'num', q:'Usando 1 GB = 1.000 MB, ¿cuántos MB son 8 GB de RAM?', ok:8000, unidad:'MB',
+      pista:'Multiplica: 8 × 1.000.', exp:'8 × 1.000 = 8.000 MB.'},
+    {tipo:'match', q:'Une cada cosa con lo que ocupa aproximadamente.',
+      pares:[['Una letra','1 byte'],['Una página de texto','Unos 2 KB'],['Una foto del celular','Unos 3 MB'],['Una película','Unos 4 GB']],
+      pista:'Fíjate en las unidades: byte, KB, MB, GB, de menor a mayor.',
+      exp:'Entre más información tiene algo, más grande es la unidad que necesitas para medirlo.'}
+  ]
+},
+{
+  titulo:'El módulo de RAM por dentro', icono:'ram',
+  cli:{nombre:'Andrea', rol:'quiere ver una RAM de verdad', piel:'#8d5a3b', pelo:'#120c08', ropa:'#6b2fbf', estilo:'crespo'},
+  pedido:'Mi tío me regaló una memoria RAM vieja. Es una tarjetica verde con cuadritos negros y una fila dorada. ¿Qué es cada parte?',
+  gracias:'¡Ya sé cómo se llama cada parte del módulo!',
+  manual:[
+    {t:'El módulo', fig:'ram', p:[
+      'La RAM viene en una tarjetica llamada <b>módulo</b> que se inserta en unas ranuras de la placa madre.',
+      'En los computadores de escritorio el módulo se llama <b>DIMM</b> y es largo, de unos 13 cm.']},
+    {t:'Laboratorio: explora el módulo', fig:'ram', p:['Toca cada parte del módulo para saber qué es:'], sim:'modulo'},
+    {t:'Las partes, en resumen', fig:'ram', fichas:PARTES.map(([, a, b]) => [a, b])}
+  ],
+  retos:[
+    {tipo:'zona', q:'Toca en el módulo la <b>muesca</b>.', ok:'muesca', pista:'Es un corte en la fila dorada, que no está justo en el centro.',
+      exp:'La muesca hace que el módulo solo entre en una posición.'},
+    {tipo:'zona', q:'Toca en el módulo los <b>chips de memoria</b>.', ok:'chips', pista:'Son los cuadros negros.',
+      exp:'Ahí se guardan los datos mientras trabajas.'},
+    {tipo:'zona', q:'Toca en el módulo los <b>contactos dorados</b>.', ok:'contactos', pista:'Es la fila de rayitas doradas en el borde de abajo.',
+      exp:'Los contactos conectan el módulo con la placa madre.'},
+    {tipo:'mcq', q:'¿Para qué sirve la muesca del módulo?',
+      ops:['Para que entre en una sola posición y solo en ranuras de su mismo tipo','Para que el módulo se enfríe','Para poner un tornillo','Es un defecto de fábrica'], ok:0,
+      pista:'Piensa en una pieza de rompecabezas.',
+      exp:'Como no está en el centro, no se puede poner al revés, y como cambia de lugar en cada tipo, impide mezclar tipos.'}
+  ]
+},
+{
+  titulo:'Tipos de RAM', icono:'ram',
+  cli:{nombre:'Don Hernán', rol:'quiere ampliar su computador', piel:'#b07a50', pelo:'#d9d9d9', ropa:'#334155', estilo:'calvo', gafas:true},
+  pedido:'Quiero ponerle más memoria a mi computador. En la tienda me preguntaron si era DDR4 o DDR5, de escritorio o de portátil… ¡y no supe qué contestar!',
+  gracias:'Ya sé qué tipo de memoria pedir. ¡Muchas gracias!',
+  manual:[
+    {t:'DDR: las generaciones', fig:'ram', p:[
+      'DDR significa <b>Double Data Rate</b> (doble tasa de datos): la memoria envía datos dos veces en cada ciclo de reloj.',
+      'Han salido varias generaciones: DDR, DDR2, DDR3, DDR4 y DDR5. Cada una es más rápida y gasta menos energía que la anterior.',
+      'Hoy se venden sobre todo <b>DDR4</b> y <b>DDR5</b>. Las dos tienen 288 contactos en escritorio, pero la muesca está en otro lugar: una DDR4 no entra en una ranura DDR5.']},
+    {t:'Laboratorio: compara los módulos', fig:'ram', p:['Toca cada tipo y fíjate en el tamaño y en dónde queda la muesca:'], sim:'muescas'},
+    {t:'Escritorio, portátil y celular', fig:'ram', fichas:[
+      ['DIMM', 'Módulo largo para computadores de escritorio.'],
+      ['SO-DIMM', 'Módulo corto, casi la mitad, para portátiles. En DDR5 tiene 262 contactos.'],
+      ['LPDDR (soldada)', 'Memoria de bajo consumo que va pegada a la placa en celulares y portátiles delgados. No se puede cambiar ni ampliar.']]}
+  ],
+  retos:[
+    {tipo:'mcq', q:'Don Hernán tiene una placa con ranuras DDR5. ¿Le sirve un módulo DDR4?',
+      ops:['No: la muesca está en otro lugar y no entra','Sí, si lo empuja con fuerza','Sí, todas las RAM son iguales','Solo si apaga el monitor'], ok:0,
+      pista:'Revisa el laboratorio de los módulos.',
+      exp:'Cada generación tiene la muesca en un lugar diferente justamente para que no se mezclen.'},
+    {tipo:'match', q:'Une cada tipo de memoria con el equipo donde se usa.',
+      pares:[['DIMM','Computador de escritorio'],['SO-DIMM','Portátil'],['LPDDR soldada','Celular o portátil delgado'],['DDR5','La generación más nueva de escritorio']],
+      pista:'SO-DIMM es la versión pequeña; LPDDR va soldada.',
+      exp:'Antes de comprar RAM hay que saber el tipo de equipo y la generación que acepta.'},
+    {tipo:'order', q:'Ordena las generaciones de la más antigua a la más nueva.', items:['DDR','DDR2','DDR3','DDR4','DDR5'],
+      pista:'Fíjate en el número.', exp:'DDR, DDR2, DDR3, DDR4 y DDR5. Cada una más rápida y eficiente que la anterior.'},
+    {tipo:'mcq', q:'Verdadero o falso: la RAM de un celular se puede cambiar por una más grande.', ops:['Verdadero','Falso'], ok:1,
+      pista:'¿Cómo va la memoria LPDDR en el celular?',
+      exp:'Falso. En los celulares la RAM va soldada: hay que elegir bien cuánta RAM tiene desde que se compra.'}
+  ]
+},
+{
+  titulo:'Velocidad y doble canal', icono:'rayo',
+  cli:{nombre:'Mateo', rol:'jugador', piel:'#b77b4e', pelo:'#0f0a06', ropa:'#1e3a8a', estilo:'crespo'},
+  pedido:'Vi dos memorias con los mismos GB, pero una dice 3200 y otra 6000. Y me dijeron que es mejor comprar dos memorias que una. ¿Por qué?',
+  gracias:'¡Dos carriles y más viajes por segundo! Ya sé cuál comprar.',
+  manual:[
+    {t:'La velocidad: viajes por segundo', fig:'rayo', p:[
+      'La velocidad de la RAM se mide en <b>MT/s</b>: millones de transferencias (viajes de datos) por segundo.',
+      'Una memoria DDR4-3200 hace 3.200 millones de viajes por segundo; una DDR5-6000 hace 6.000 millones. Entre más alto el número, más rápida.']},
+    {t:'Laboratorio: una vía o dos vías', fig:'rayo', p:['Imagina que los datos viajan en camiones. Compara un canal con doble canal:'], sim:'carriles'},
+    {t:'El doble canal', fig:'ram', p:[
+      'Si pones <b>dos módulos iguales</b> en las ranuras correctas, el procesador usa dos canales al mismo tiempo, como una carretera de dos carriles: pasan el doble de datos.',
+      'Por eso 2 módulos de 8 GB suelen rendir más que 1 módulo de 16 GB, aunque los dos sumen 16 GB.']}
+  ],
+  retos:[
+    {tipo:'mcq', q:'Mateo puede comprar 16 GB en un solo módulo o en dos módulos de 8 GB. ¿Qué le recomiendas?',
+      ops:['Dos de 8 GB, para usar el doble canal','Uno de 16 GB, porque un módulo es más rápido','Da exactamente igual','Ninguno, mejor 4 GB'], ok:0,
+      pista:'Dos módulos iguales = dos carriles.', exp:'Con dos módulos iguales se activa el doble canal y pasan el doble de datos.'},
+    {tipo:'order', q:'Ordena estas memorias de la más lenta a la más rápida.', items:['DDR4-2400','DDR4-3200','DDR5-4800','DDR5-6000'],
+      pista:'El número son los millones de viajes por segundo.', exp:'2.400 < 3.200 < 4.800 < 6.000 MT/s.'},
+    {tipo:'num', q:'Con un solo canal pasan 25 GB de datos por segundo. Con doble canal pasa el doble. ¿Cuántos GB por segundo pasan con doble canal?', ok:50, unidad:'GB/s',
+      pista:'El doble es multiplicar por 2.', exp:'25 × 2 = 50 GB/s.'},
+    {tipo:'mcq', q:'Verdadero o falso: para usar el doble canal conviene que los dos módulos sean iguales (misma capacidad y velocidad).', ops:['Verdadero','Falso'], ok:0,
+      pista:'Dos carriles iguales funcionan mejor juntos.', exp:'Verdadero. Lo ideal es comprar un kit de dos módulos iguales.'}
+  ]
+},
+{
+  titulo:'¿Cuánta RAM necesito?', icono:'barras',
+  cli:{nombre:'Doña Rosa', rol:'vende arepas y recibe pedidos por computador', piel:'#a8693f', pelo:'#2a1a12', ropa:'#b8327a', estilo:'mono'},
+  pedido:'Voy a comprarle computador a mi hija y celular para mí. ¿Cuánta RAM necesitamos? No quiero gastar de más… ni quedarme corta.',
+  gracias:'¡Compré justo lo que necesitábamos! Gracias.',
+  manual:[
+    {t:'Laboratorio: la gráfica de la RAM', fig:'barras', p:['Toca cada barra para ver para quién es. Cambia entre computadores y celulares:'], sim:'grafico'},
+    {t:'Cómo elegir', fig:'barras', p:[
+      'Primero pregunta: ¿qué va a hacer la persona con el equipo? La RAM se elige según los programas que va a usar al mismo tiempo.',
+      'En computadores, hoy 8 GB es lo mínimo cómodo para estudiar; 16 GB para jugar; 32 GB para editar video o hacer 3D.',
+      'En celulares: 4 a 6 GB en gama de entrada, unos 8 GB en gama media y de 12 a 16 GB en gama alta.']}
+  ],
+  retos:[
+    {tipo:'match', q:'Recomienda la RAM de computador para cada persona.',
+      pares:[['Estudiar, investigar y ver videos','8 GB'],['Jugar videojuegos modernos','16 GB'],['Editar videos y hacer 3D','32 GB'],['Inteligencia artificial y trabajo profesional','64 GB']],
+      pista:'Revisa la gráfica de computadores.', exp:'Entre más pesado el trabajo, más RAM: pero no hay que venderle 64 GB a quien solo estudia.'},
+    {tipo:'mcq', q:'Doña Rosa usa el celular para WhatsApp, llamadas y recibir pedidos. ¿Qué RAM le alcanza?',
+      ops:['Unos 6 GB, de gama de entrada o media','16 GB, de gama alta','1 GB','64 GB'], ok:0,
+      pista:'Sus aplicaciones son livianas.', exp:'Con 6 GB le alcanza de sobra para sus aplicaciones, sin gastar en un gama alta.'},
+    {tipo:'num', q:'Un computador tiene 2 ranuras con un módulo de 4 GB en cada una. Si cambias los dos por módulos de 8 GB, ¿cuántos GB de RAM ganas?', ok:8, unidad:'GB',
+      pista:'Antes: 4 + 4. Después: 8 + 8. Resta.', exp:'Antes 8 GB, después 16 GB: ganas 8 GB.'},
+    {tipo:'mesa', q:'La hija de Doña Rosa tiene 8 GB. Windows ocupa 3 GB. Quiere jugar Minecraft mientras escucha música. ¿Le cabe? Abre lo que necesita.', cap:8, sis:3, necesita:[3, 2],
+      pista:'Abre Minecraft y música, y mira la barra.', exp:'3 + 3 + 0,5 = 6,5 GB: sí le cabe, y le sobra 1,5 GB.'}
+  ]
+},
+{
+  titulo:'Instalar la RAM sin dañarla', icono:'llave',
+  cli:{nombre:'Óscar', rol:'compró su primera memoria', piel:'#b07a50', pelo:'#141010', ropa:'#1d4ed8', estilo:'crespo'},
+  pedido:'Ya compré la memoria correcta, pero me da miedo instalarla y dañar algo. ¿Cómo se hace bien?',
+  gracias:'¡Clic! Quedó perfecta y el computador ya muestra la nueva memoria.',
+  manual:[
+    {t:'Laboratorio: paso a paso', fig:'llave', p:['Avanza por los pasos para instalar un módulo de RAM:'], sim:'pasos'},
+    {t:'La electricidad estática', fig:'llave', p:[
+      'Nuestro cuerpo acumula <b>electricidad estática</b>, como cuando te frotas un globo en el pelo. Una pequeña descarga que tú ni sientes puede dañar los chips.',
+      'Por eso, antes de tocar la RAM, se toca una parte metálica sin pintura de la torre o se usa una manilla antiestática. Y siempre se toma el módulo por los bordes, sin tocar los contactos dorados.']}
+  ],
+  retos:[
+    {tipo:'order', q:'Ordena los pasos para instalar un módulo de RAM.', items:['Apagar y desconectar el computador','Tocar metal para descargar la estática','Abrir los seguros de la ranura','Alinear la muesca con la ranura','Presionar hasta escuchar el clic'],
+      pista:'Lo primero siempre es la seguridad: sin electricidad.', exp:'Así se instala sin riesgo para ti ni para el computador.'},
+    {tipo:'mcq', q:'¿Por qué se toca una parte metálica de la torre antes de tocar la RAM?',
+      ops:['Para descargar la electricidad estática del cuerpo','Para calentar las manos','Para que la RAM sea más rápida','Para limpiar el polvo'], ok:0,
+      pista:'Piensa en el globo frotado en el pelo.', exp:'Una descarga de estática puede dañar los chips aunque tú no la sientas.'},
+    {tipo:'mcq', q:'Verdadero o falso: se puede instalar la RAM con el computador encendido para ahorrar tiempo.', ops:['Verdadero','Falso'], ok:1,
+      pista:'¿Qué es lo primero de la lista de pasos?', exp:'Falso. Se puede dañar la memoria, la placa o incluso lastimar a quien la instala.'},
+    {tipo:'mcq', q:'¿Cómo sabe Óscar que la memoria quedó bien instalada?',
+      ops:['Los seguros cerraron con un clic y el sistema muestra la nueva cantidad de RAM','El módulo quedó un poco inclinado','Se escucha un pitido largo al prender','La pantalla se queda negra'], ok:0,
+      pista:'Revisa el último paso del laboratorio.', exp:'Al prender, en Configuración → Sistema → Información se puede ver la RAM instalada.'}
+  ]
+},
+{
+  titulo:'Diagnóstico: problemas de RAM', icono:'lupa', cli:JEFA,
+  pedido:'Último reto del laboratorio: vas a atender clientes con problemas de memoria. Escucha bien los síntomas, como un médico, y da el diagnóstico.',
+  gracias:'¡Excelente diagnóstico! Terminaste el Laboratorio RAM. Ya puedes ir a la tienda de notas.',
+  manual:[
+    {t:'Síntomas y causas', fig:'lupa', fichas:[
+      ['Lento con muchas cosas abiertas', 'Poca RAM: la mesa se llena y el computador usa el disco como memoria virtual.'],
+      ['Pitidos al prender y no hay imagen', 'Módulo mal puesto, sucio o dañado. Muchas placas avisan con pitidos.'],
+      ['Pantallazos azules o reinicios', 'Puede ser un módulo de RAM dañado. Se revisa con programas de diagnóstico.'],
+      ['El sistema muestra menos RAM de la instalada', 'Un módulo quedó mal conectado o no es compatible.']]},
+    {t:'El Administrador de tareas', fig:'lupa', p:[
+      'En Windows, el <b>Administrador de tareas</b> (Ctrl + Shift + Esc) muestra qué programas están usando la RAM y qué porcentaje de la memoria está ocupado.',
+      'Si la memoria está casi siempre por encima del 90 %, conviene cerrar programas que no se usan o ampliar la RAM.']}
+  ],
+  retos:[
+    {tipo:'match', q:'Une cada síntoma con su causa más probable.',
+      pares:[['Se pone lento con muchas cosas abiertas','Poca RAM'],['Pitidos al prender y no hay imagen','Módulo mal puesto o dañado'],['Muestra menos RAM de la instalada','Un módulo mal conectado'],['Se pierde el trabajo al irse la luz','No se guardó: la RAM es volátil']],
+      pista:'Revisa la página de síntomas.', exp:'Un buen técnico escucha los síntomas antes de cambiar piezas.'},
+    {tipo:'mcq', q:'El Administrador de tareas de un cliente muestra la memoria al 95 % todo el tiempo. ¿Qué le recomiendas?',
+      ops:['Cerrar programas que no usa o ampliar la RAM','Cambiar el mouse','Borrar todas sus fotos','Subir el volumen'], ok:0,
+      pista:'La mesa está casi llena.', exp:'Con la mesa al 95 %, el computador usa memoria virtual y se pone lento.'},
+    {tipo:'mcq', q:'Un cliente instaló un módulo nuevo y al prender suenan pitidos y no hay imagen. ¿Qué revisas primero?',
+      ops:['Que el módulo esté bien metido, con los seguros cerrados','Que el monitor esté limpio','Que el teclado tenga pilas','Que el internet funcione'], ok:0,
+      pista:'Piensa en el paso del clic.', exp:'Lo más común es que el módulo no haya quedado bien insertado.'},
+    {tipo:'mesa', q:'Último cliente: un computador de 16 GB. Windows ocupa 3 GB. El cliente quiere jugar un juego moderno mientras hace videollamada con sus amigos y tiene el navegador abierto. ¿Le cabe todo?', cap:16, sis:3, necesita:[5, 1, 0],
+      pista:'Abre lo que pide y mira si la barra se pasa.', exp:'3 + 6 + 1 + 2 = 12 GB: le cabe y le sobran 4 GB.'}
+  ]
+}
+];
+
+MIS.forEach((m, mi) => m.retos.forEach((r, ri) => { r.id = `m${mi + 1}r${ri + 1}`; }));
+
+/* =========================================================
+   VARIANTES: cada estudiante recibe los retos en otro orden
+   y con versiones distintas (mismo tema, otros datos).
+   ========================================================= */
+const fN = n => Number(n).toLocaleString('es-CO');
+const fD = n => String(n).replace('.', ',');
+const VF = ['Verdadero', 'Falso'];
+const VARIANTES = {
+  m2r1: [['el navegador', 2, 'la videollamada', 1], ['el editor de fotos', 2, 'la música', 0.5], ['un juego moderno', 6, 'el navegador', 2], ['Minecraft', 3, 'la videollamada', 1]].map(([a, ga, b, gb]) => ({
+    q:`En un computador, Windows usa 3 GB, ${a} ${fD(ga)} GB y ${b} ${fD(gb)} GB. ¿Cuántos GB de RAM se están usando en total?`, ok:3 + ga + gb, tol:0.05,
+    pista:`Suma todo: 3 + ${fD(ga)} + ${fD(gb)}.`, exp:`3 + ${fD(ga)} + ${fD(gb)} = ${fD(3 + ga + gb)} GB.` })),
+  m2r2: [
+    { q:'Sofía tiene un computador de 8 GB. Windows ya ocupa 3 GB. Quiere jugar Minecraft con música de fondo. Abre lo que necesita sin pasarte de la mesa.', necesita:[3, 2],
+      exp:'3 + 3 + 0,5 = 6,5 GB: le quedan 1,5 GB libres.' },
+    { q:'El computador viejo de la abuela de Sofía tiene 4 GB. Windows ocupa 3 GB. La abuela solo quiere hacer una videollamada. Abre lo que necesita sin pasarte.', cap:4, necesita:[1],
+      exp:'3 + 1 = 4 GB: la mesa queda justo llena. Si abre algo más, se pondrá lento.' }],
+  m2r4: [{ q:'Verdadero o falso: un computador con 4 GB de RAM aguanta más programas abiertos que uno con 16 GB.', ops:VF, ok:1,
+    exp:'Falso. 16 GB es una mesa cuatro veces más grande que 4 GB.' }],
+  m3r2: [{ q:'Juan estaba dibujando en Paint y el computador se reinició por una actualización antes de que guardara. ¿Qué pasó con su dibujo?',
+    ops:['Se perdió, porque solo estaba en la RAM','Se guardó solo en el monitor','Está escondido en el mouse','Sigue en la RAM esperando a que prenda'],
+    exp:'Reiniciar vacía la RAM, y lo que no se había guardado solo estaba ahí.' }],
+  m3r4: [{ q:'Verdadero o falso: lo que guardaste en el disco SSD se borra cuando apagas el computador.', ops:VF, ok:1,
+    pista:'¿El SSD es volátil o no volátil?', exp:'Falso. El SSD es no volátil: guarda la información sin electricidad.' }],
+  m4r2: [3, 5, 6, 10].map(b => ({ q:`1 byte tiene 8 bits. ¿Cuántos bits hay en ${b} bytes?`, ok:b * 8, pista:`Multiplica: ${b} × 8.`, exp:`${b} × 8 = ${b * 8} bits.` })),
+  m4r3: [4, 16, 2, 32].map(g => ({ q:`Usando 1 GB = 1.000 MB, ¿cuántos MB son ${g} GB de RAM?`, ok:g * 1000, pista:`Multiplica: ${g} × 1.000.`, exp:`${g} × 1.000 = ${fN(g * 1000)} MB.` })),
+  m5r1: [
+    { q:'Toca en el módulo la <b>etiqueta</b>.', ok:'etiqueta', pista:'Es el rectángulo claro con letras.', exp:'La etiqueta dice capacidad, tipo y velocidad.' },
+    { q:'Toca en el módulo las <b>muescas laterales</b>.', ok:'laterales', pista:'Están en los dos extremos del módulo, a los lados.', exp:'Ahí se enganchan los seguros de la ranura.' }],
+  m6r4: [{ q:'Verdadero o falso: un módulo SO-DIMM (de portátil) es más corto que un DIMM (de escritorio).', ops:VF, ok:0,
+    pista:'Revisa el laboratorio de los módulos.', exp:'Verdadero. El SO-DIMM mide casi la mitad, porque en un portátil hay menos espacio.' }],
+  m7r1: [{ q:'Mateo puede comprar 32 GB en un solo módulo o en dos módulos de 16 GB. ¿Qué le recomiendas?',
+    ops:['Dos de 16 GB, para usar el doble canal','Uno de 32 GB, porque un módulo es más rápido','Da exactamente igual','Ninguno, mejor 4 GB'] }],
+  m7r3: [20, 30, 48].map(v => ({ q:`Con un solo canal pasan ${v} GB de datos por segundo. Con doble canal pasa el doble. ¿Cuántos GB por segundo pasan con doble canal?`, ok:v * 2,
+    exp:`${v} × 2 = ${v * 2} GB/s.` })),
+  m7r4: [{ q:'Verdadero o falso: una memoria DDR5-6000 hace más viajes de datos por segundo que una DDR4-3200.', ops:VF, ok:0,
+    pista:'Compara los números: 6000 y 3200.', exp:'Verdadero. 6.000 millones de viajes por segundo contra 3.200 millones.' }],
+  m8r2: [{ q:'Un primo de Doña Rosa juega en el celular juegos pesados y graba videos en 4K. ¿Qué RAM le recomiendas?',
+    ops:['De 12 a 16 GB, de gama alta','2 GB','4 GB, de gama de entrada','En los celulares la RAM no importa'],
+    pista:'Juegos pesados y video 4K: revisa la gráfica de celulares.', exp:'Para juegos pesados y video 4K conviene un gama alta con 12 a 16 GB.' }],
+  m8r3: [
+    { q:'Un computador tiene 2 ranuras con un módulo de 8 GB en cada una. Si los cambias por módulos de 16 GB, ¿cuántos GB de RAM ganas?', ok:16,
+      pista:'Antes: 8 + 8. Después: 16 + 16. Resta.', exp:'Antes 16 GB, después 32 GB: ganas 16 GB.' },
+    { q:'Un computador tiene 4 ranuras con un módulo de 4 GB en cada una. Si los cambias por módulos de 8 GB, ¿cuántos GB de RAM ganas?', ok:16,
+      pista:'Antes: 4 × 4. Después: 4 × 8. Resta.', exp:'Antes 16 GB, después 32 GB: ganas 16 GB.' }],
+  m8r4: [{ q:'La hija de Doña Rosa tiene 8 GB. Windows ocupa 3 GB. Quiere editar fotos con el navegador abierto para buscar ideas. ¿Le cabe? Abre lo que necesita.', necesita:[4, 0],
+    exp:'3 + 2 + 2 = 7 GB: sí le cabe, y le sobra 1 GB.' }],
+  m9r3: [{ q:'Verdadero o falso: el módulo de RAM se debe tomar por los contactos dorados.', ops:VF, ok:1,
+    pista:'Revisa la página de la electricidad estática.', exp:'Falso. Se toma por los bordes; tocar los contactos los ensucia y puede pasar estática.' }],
+  m10r4: [{ q:'Último cliente: un computador de 16 GB. Windows ocupa 3 GB. La clienta quiere editar fotos, tener Minecraft abierto para su hermano y hacer videollamada. ¿Le cabe todo?', necesita:[4, 3, 1],
+    exp:'3 + 2 + 3 + 1 = 9 GB: le cabe y le sobran 7 GB.' }]
+};
+MIS.forEach(m => m.retos.forEach(r => { if (VARIANTES[r.id]) r.var = VARIANTES[r.id]; }));
+
+/* ---------- Azar con semilla: cada estudiante siempre ve SU versión ---------- */
+function hashTxt(s){ let h = 2166136261; for (const c of String(s)){ h ^= c.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+function rngDe(seed){ let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function personalizar(semilla){
+  MIS.forEach((m, mi) => {
+    const rnd = rngDe(hashTxt(semilla + '|m' + mi)), orden = m.retos.slice();
+    for (let i = orden.length - 1; i > 0; i--){ const j = Math.floor(rnd() * (i + 1)); [orden[i], orden[j]] = [orden[j], orden[i]]; }
+    m.retos = orden.map(r => {
+      if (!r.var) return r;
+      const k = Math.floor(rngDe(hashTxt(semilla + '|' + r.id))() * (r.var.length + 1));
+      return k === 0 ? r : Object.assign({}, r, r.var[k - 1]);
+    });
+  });
+}
+
+const TOTAL = MIS.reduce((s, m) => s + m.retos.length, 0);
+const MAXP = TOTAL * PTS[0];
+/* Tienda de notas: precio = porcentaje del salario máximo posible */
+const NOTAS = [[5.0, .9], [4.5, .8], [4.0, .7], [3.5, .6], [3.0, .5]].map(([n, pct]) => ({ n, pct, precio:Math.round(MAXP * pct) }));
+const fmtNota = n => n.toFixed(1).replace('.', ',');
+function notaComprable(sal){
+  const t = NOTAS.find(x => sal >= x.precio);
+  if (t) return t.n;
+  return Math.min(2.9, Math.round((1 + 1.9 * sal / NOTAS[NOTAS.length - 1].precio) * 10) / 10);   // no alcanza: de 1,0 a 2,9
+}
+
+/* ---------- Estado ---------- */
+const S = { user:'', clave:'', nombre:'', curso:'', demo:false, res:{}, tries:{}, sonido:true,
+  saving:false, again:false, pend:[], ver:0, savedVer:0, saveSt:'ok', retryT:null,
+  faltas:0, racha:0, penal:0, bloq:false, pausaVig:false, bloqT:null };
+let R = null;   // reto en curso
+
+const ganadas = () => Object.values(S.res).reduce((s, x) => s + (x.p || 0), 0);
+const monedas = () => Math.max(0, ganadas() - S.penal);
+const resueltos = () => Object.keys(S.res).length;
+const correctos = () => Object.values(S.res).filter(x => x.ok).length;
+const nota = () => notaComprable(monedas());
+const notaTxt = () => nota().toFixed(1).replace('.', ',');
+const misionHecha = mi => MIS[mi].retos.every(r => S.res[r.id]);
+const abierta = () => true;   // todas las misiones abiertas
+function posActual(){
+  for (let mi = 0; mi < MIS.length; mi++) for (let ri = 0; ri < MIS[mi].retos.length; ri++) if (!S.res[MIS[mi].retos[ri].id]) return {mi, ri};
+  return null;
+}
+function rango(n){ return n >= 4.6 ? 'Experto en memoria RAM' : n >= 4 ? 'Técnico de memoria' : n >= 3 ? 'Aprendiz avanzado' : 'Aprendiz del laboratorio'; }
+const pendiente = () => S.saving || S.ver !== S.savedVer || S.pend.length > 0;
+
+/* ---------- Sonido ---------- */
+let AC = null;
+function tono(f, d = .12, tipo = 'sine', v = .08, delay = 0){
+  if (!S.sonido) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const t = AC.currentTime + delay, o = AC.createOscillator(), g = AC.createGain();
+    o.type = tipo; o.frequency.value = f;
+    g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + d + .02);
+  } catch (e) {}
+}
+const SFX = {
+  ok(){ tono(660, .1); tono(880, .1, 'sine', .08, .1); tono(1320, .18, 'triangle', .06, .2); },
+  bad(){ tono(200, .22, 'square', .045); },
+  tap(){ tono(520, .05, 'triangle', .04); },
+  win(){ [523, 659, 784, 1046].forEach((f, i) => tono(f, .2, 'triangle', .07, i * .12)); }
+};
+
+/* ---------- Conexión con la hoja ---------- */
+async function api(body){
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 25000);
+  try {
+    const res = await fetch(SCRIPT_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(body), signal:ctl.signal });
+    return await res.json();
+  } finally { clearTimeout(t); }
+}
+function resumen(){
+  const p = posActual();
+  return { mision: p ? `M${p.mi + 1} ${MIS[p.mi].titulo} (reto ${p.ri + 1})` : 'Terminó todas las misiones',
+    retos: resueltos(), total: TOTAL, correctos: correctos(), monedas: monedas(), nota: nota(), finalizado: !p, salidas: S.faltas };
+}
+async function guardar(){
+  if (S.demo){ setSave('demo'); return; }
+  if (S.saving){ S.again = true; return; }
+  clearTimeout(S.retryT);
+  S.saving = true; setSave('saving');
+  const ver = S.ver, env = S.pend.slice();
+  try {
+    const r = await api({ accion:'guardar', usuario:S.user, clave:S.clave, estado:{v:1, res:S.res, tries:S.tries, faltas:S.faltas, racha:S.racha, penal:S.penal, bloq:S.bloq}, resumen:resumen(), eventos:env });
+    if (!r || !r.ok) throw new Error((r && r.error) || 'Respuesta inválida');
+    S.pend.splice(0, env.length); S.savedVer = ver; setSave('ok');
+  } catch (e) {
+    setSave('error'); S.retryT = setTimeout(guardar, 10000);
+  } finally {
+    S.saving = false;
+    if (S.again){ S.again = false; guardar(); }
+  }
+}
+const SAVE_TXT = { ok:'Progreso guardado', saving:'Guardando…', error:'Sin conexión: reintentando', demo:'Modo demo: no se guarda' };
+function setSave(st){ S.saveSt = st; const e = $('#saveSt'); if (e){ e.className = 'save ' + st; e.textContent = SAVE_TXT[st]; } }
+window.addEventListener('beforeunload', e => { if (S.user && !S.demo && pendiente()){ e.preventDefault(); e.returnValue = ''; } });
+
+/* =========================================================
+   PANTALLAS
+   ========================================================= */
+const app = $('#app');
+function pantalla(html){ app.innerHTML = html; window.scrollTo(0, 0); }
+
+function renderLogin(){
+  pantalla(`<main class="login">
+  <svg class="sign" viewBox="0 0 600 180" role="img" aria-label="Laboratorio RAM">
+    <defs><filter id="glow" x="-10%" y="-30%" width="120%" height="160%"><feGaussianBlur stdDeviation="3.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <rect x="10" y="10" width="580" height="160" rx="22" fill="#0b0b20" stroke="#9d6bff" stroke-width="3" filter="url(#glow)"/>
+    <g class="flick" filter="url(#glow)">
+      <text x="300" y="100" text-anchor="middle" font-family="Orbitron, sans-serif" font-weight="900" font-size="54" textLength="540" lengthAdjust="spacingAndGlyphs" fill="none" stroke="#00e5ff" stroke-width="2.2">Laboratorio RAM</text>
+    </g>
+    <text x="300" y="142" text-anchor="middle" font-family="Rajdhani, sans-serif" font-weight="700" font-size="24" fill="#ff2bd6" filter="url(#glow)">Un laboratorio de TecnoTienda para grado sexto</text>
+  </svg>
+  <p class="lead">Descubre todo sobre la memoria RAM: qué es, cómo funciona, cómo se mide, cómo se instala y cómo se elige.</p>
+  <form class="login-card" id="fLogin" novalidate>
+    <label>Usuario<input id="lu" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false"></label>
+    <label>Contraseña<input id="lc" type="password" autocomplete="current-password"></label>
+    <button class="btn pri" id="btnEntrar" type="button">Entrar a la tienda</button>
+    <p id="lmsg" class="lmsg" role="status" aria-live="polite">${SCRIPT_URL ? '' : 'Modo demo: entra con usuario <b>demo</b> y contraseña <b>1234</b>. El progreso no se guarda.'}</p>
+  </form>
+  <p class="pie">Misaelverse. Tecnología, grado sexto. Colegio Misael Pastrana Borrero IED</p>
+  </main>`);
+  $('#fLogin').onsubmit = e => { e.preventDefault(); };
+  $('#btnEntrar').onclick = entrar;
+  ['#lu', '#lc'].forEach(s => { $(s).onkeydown = e => { if (e.key === 'Enter'){ e.preventDefault(); entrar(); } }; });
+  $('#lu').focus();
+}
+
+async function entrar(){
+  const u = $('#lu').value.trim(), c = $('#lc').value.trim(), msg = $('#lmsg'), b = $('#btnEntrar');
+  if (!u || !c){ msg.textContent = 'Escribe tu usuario y tu contraseña.'; return; }
+  if (norm(u) === 'demo' && c === '1234'){ Object.assign(S, {demo:true, user:'demo', nombre:'Profe', curso:'Modo de prueba', saveSt:'demo'}); arrancar(null); return; }
+  if (!SCRIPT_URL){ msg.innerHTML = 'Modo demo: entra con usuario <b>demo</b> y contraseña <b>1234</b>.'; return; }
+  b.disabled = true; msg.textContent = 'Buscando tu ficha en la tienda…';
+  try {
+    const r = await api({ accion:'login', usuario:u, clave:c });
+    if (!r || !r.ok){ msg.textContent = (r && r.error) || 'No se pudo entrar. Intenta otra vez.'; b.disabled = false; return; }
+    const tc = s => String(s).toLowerCase().replace(/(^|\s)(\S+)/g, (m, a, w) => a + (['de', 'del', 'la'].includes(w) ? w : w[0].toUpperCase() + w.slice(1)));
+    Object.assign(S, { user:r.usuario, clave:c, nombre:tc(r.nombre || r.usuario), curso:r.curso || '' });
+    arrancar(r.estado);
+  } catch (e) {
+    msg.textContent = 'No hay conexión con la hoja de la profe. Revisa el internet y vuelve a intentar.';
+    b.disabled = false;
+  }
+}
+
+function arrancar(est){
+  personalizar(S.demo ? String(Math.random()) : S.user);
+  if (est && est.res){ S.res = est.res; S.tries = est.tries || {}; S.faltas = est.faltas || 0; S.racha = est.racha || 0; S.penal = est.penal || 0; S.bloq = !!est.bloq; }
+  else if (!S.demo){ S.ver++; guardar(); }   // registra que el estudiante entró
+  renderHub();
+  if (S.bloq) mostrarBloqueo(0);
+}
+
+function salir(){
+  S.pausaVig = true;
+  if (!S.demo && pendiente() && !confirm('Tu último avance todavía se está guardando. Si sales ahora podrías perderlo. ¿Salir de todos modos?')){ S.pausaVig = false; return; }
+  S.ver = S.savedVer; S.pend = [];
+  location.reload();
+}
+
+function hud(){
+  return `<header class="hud">
+    <div class="hud-marca">Laboratorio RAM</div>
+    <div class="hud-user"><b>${esc(S.nombre)}</b><span>${esc(S.curso)}</span></div>
+    <div class="hud-coins" aria-label="Salario disponible">${COIN}<b id="coins">${money(monedas())}</b></div>
+    ${VIG.activa ? `<div id="hudSal" class="hud-sal ${S.faltas ? 'alerta' : ''}">Salidas: ${S.faltas}</div>` : ''}
+    <div id="saveSt" class="save ${S.saveSt}">${SAVE_TXT[S.saveSt]}</div>
+    <button class="icon-btn" id="btnSon" aria-label="Activar o silenciar el sonido">${S.sonido ? '🔊' : '🔇'}</button>
+    <button class="icon-btn" id="btnSalir">Salir</button>
+  </header>`;
+}
+function bindHud(){
+  $('#btnSon').onclick = () => { S.sonido = !S.sonido; $('#btnSon').textContent = S.sonido ? '🔊' : '🔇'; };
+  $('#btnSalir').onclick = salir;
+}
+
+/* ---------- Tienda (inicio) ---------- */
+function renderHub(){
+  const cur = posActual(), n = resueltos(), primer = esc((S.nombre || '').split(' ')[0]);
+  let msg, txtBtn;
+  if (!cur){ msg = `¡Lo lograste, ${primer}! Atendiste a todos los clientes de la tienda. Mira tu resultado final.`; txtBtn = 'Ver mi resultado'; }
+  else if (n === 0){ msg = `¡Hola, ${primer}! Hoy entras como aprendiz al Laboratorio RAM de TecnoTienda. Vas a descubrir todo sobre la memoria RAM: qué es, cómo funciona, cómo se mide, cómo se instala y cómo se elige. Cada reto es un trabajo pagado: te pagan ${money(PTS[0])} si lo resuelves al primer intento, ${money(PTS[1])} al segundo y ${money(PTS[2])} al tercero. Al final, con tu salario compras tu nota en la tienda de notas. Las 10 secciones están abiertas, pero te recomiendo ir en orden: cada una usa lo que aprendiste en la anterior.`; txtBtn = 'Empezar a trabajar'; }
+  else { const m = MIS[cur.mi]; msg = `¡Qué bueno verte, ${primer}! Ibas en la misión ${cur.mi + 1}, “${esc(m.titulo)}”, reto ${cur.ri + 1} de ${m.retos.length}. Sigue donde quedaste.`; txtBtn = 'Continuar donde quedé'; }
+
+  pantalla(hud() + `<main class="wrap">
+    <section class="mostrador">
+      <div>${avatar(JEFA)}</div>
+      <div class="burbuja"><div class="quien">Don Julián, dueño de TecnoTienda</div><p>${msg}</p>
+        ${VIG.activa && cur ? `<p class="aviso">Regla del taller: si cambias de pestaña, minimizas o abres otra ventana, te descuentan ${money(VIG.penalMonedas)} del salario y te alcanza para una nota más baja. Con ${VIG.maxSalidas} salidas la actividad se bloquea.</p>` : ''}
+        <button class="btn pri" id="btnSeguir">${txtBtn}</button></div>
+    </section>
+    <div class="prog"><span>Retos resueltos: ${n} de ${TOTAL}</span><div class="bar"><i style="width:${n / TOTAL * 100}%"></i></div></div>
+    <section class="lista-precios"><h2 class="sec-t">Tienda de notas: precios</h2>
+      <div class="precios">${NOTAS.map(x => `<div class="precio-nota ${monedas() >= x.precio ? 'alcanza' : ''}"><b>${fmtNota(x.n)}</b><span>${money(x.precio)}</span></div>`).join('')}</div>
+      <p class="precios-nota">Salario máximo posible: ${money(MAXP)}. Llevas ${money(monedas())}: hoy te alcanza para un <b>${fmtNota(nota())}</b>. Con menos de ${money(NOTAS[NOTAS.length - 1].precio)} no alcanza para aprobar.</p></section>
+    <h2 class="sec-t">Secciones de la tienda</h2>
+    <div class="estantes">${MIS.map(estante).join('')}</div>
+  </main>`);
+  bindHud();
+  $('#btnSeguir').onclick = () => cur ? abrirMision(cur.mi) : renderFinal();
+  $$('.estante[data-mi]').forEach(b => b.onclick = () => abrirMision(+b.dataset.mi));
+}
+function estante(m, mi){
+  const hechos = m.retos.filter(r => S.res[r.id]).length, tot = m.retos.length;
+  const est = hechos === tot ? 'hecha' : (abierta(mi) ? 'abierta' : 'cerrada');
+  const lbl = est === 'hecha' ? 'Completada' : est === 'abierta' ? (hechos ? `En curso: ${hechos} de ${tot}` : `${tot} retos`) : 'Se abre al terminar la anterior';
+  return `<button class="estante ${est}" ${est !== 'cerrada' ? `data-mi="${mi}"` : 'disabled'} aria-label="Misión ${mi + 1}: ${esc(m.titulo)}. ${lbl}">
+    <span class="est-n">Misión ${mi + 1}</span><span class="est-ico">${ICON[m.icono]}</span>
+    <span class="est-t">${esc(m.titulo)}</span><span class="est-c">Cliente: ${esc(m.cli.nombre)}</span>
+    <span class="est-bar"><i style="width:${hechos / tot * 100}%"></i></span><span class="est-l">${lbl}</span></button>`;
+}
+
+/* ---------- Misión ---------- */
+function abrirMision(mi){
+  if (!abierta(mi)) return;
+  const m = MIS[mi], ri = m.retos.findIndex(r => !S.res[r.id]);
+  if (ri === -1) return renderCierre(mi);
+  if (ri === 0 && !S.tries[m.retos[0].id]) return renderIntro(mi);
+  renderReto(mi, ri);
+}
+function dotsHtml(mi, ri){
+  return MIS[mi].retos.map((r, i) => { const x = S.res[r.id]; return `<i class="dot ${x ? (x.ok ? 'ok' : 'mal') : (i === ri ? 'cur' : '')}"></i>`; }).join('');
+}
+function barMision(mi, ri, conManual){
+  return `<div class="mbar"><button class="link" id="btnTienda">Volver a la tienda</button>
+    <div class="mbar-t"><span>Misión ${mi + 1}</span><b>${esc(MIS[mi].titulo)}</b></div>
+    <div class="dots" aria-hidden="true">${dotsHtml(mi, ri)}</div>
+    ${conManual ? '<button class="link" id="btnManual">Repasar manual</button>' : ''}</div>`;
+}
+function bindBar(){ const b = $('#btnTienda'); if (b) b.onclick = renderHub; }
+
+function renderIntro(mi){
+  const m = MIS[mi];
+  pantalla(hud() + `<main class="wrap">${barMision(mi, -1)}
+    <section class="escena"><div>${avatar(m.cli)}</div>
+      <div class="burbuja"><div class="quien">${esc(m.cli.nombre)}, ${esc(m.cli.rol)}</div><p>${m.pedido}</p></div></section>
+    <div class="acciones"><button class="btn pri" id="go">Abrir el manual del técnico</button></div></main>`);
+  bindHud(); bindBar();
+  $('#go').onclick = () => renderManual(mi, 0, null);
+  $('#go').focus();
+}
+
+function renderManual(mi, p, volverA){
+  const m = MIS[mi], pg = m.manual[p], last = m.manual.length - 1;
+  const sig = p < last ? 'Página siguiente' : (volverA != null ? 'Volver al reto' : `Atender a ${m.cli.nombre}`);
+  pantalla(hud() + `<main class="wrap">${barMision(mi, -1)}
+    <article class="manual">
+      <div class="man-head"><span class="man-ico">${ICON[pg.fig || m.icono]}</span>
+        <div><div class="man-pag">Manual del técnico, página ${p + 1} de ${m.manual.length}</div><h2>${pg.t}</h2></div></div>
+      ${(pg.p || []).map(x => `<p>${x}</p>`).join('')}
+      ${pg.fichas ? `<dl class="fichas">${pg.fichas.map(([a, b]) => `<div><dt>${a}</dt><dd>${b}</dd></div>`).join('')}</dl>` : ''}
+      ${pg.sim ? '<div class="sim" id="simBox"></div>' : ''}
+    </article>
+    <div class="acciones"><button class="btn" id="ant" ${p === 0 ? 'disabled' : ''}>Página anterior</button><button class="btn pri" id="sig">${esc(sig)}</button></div></main>`);
+  bindHud(); bindBar();
+  $('#ant').onclick = () => renderManual(mi, p - 1, volverA);
+  $('#sig').onclick = () => {
+    if (p < last) return renderManual(mi, p + 1, volverA);
+    const ri = volverA != null ? volverA : m.retos.findIndex(r => !S.res[r.id]);
+    renderReto(mi, ri < 0 ? 0 : ri);
+  };
+  if (pg.sim) SIM[pg.sim]($('#simBox'));
+  $('#sig').focus();
+}
+
+/* ---------- Reto ---------- */
+function renderReto(mi, ri){
+  const m = MIS[mi], r = m.retos[ri];
+  R = { mi, ri, r, done:false, int:S.tries[r.id] || 0, check:null, retry:null, reveal:null };
+  const quien = r.cli || m.cli;
+  pantalla(hud() + `<main class="wrap">${barMision(mi, ri, true)}
+    <section>
+      <div class="reto-head"><div>${avatar(quien)}</div>
+        <div class="burbuja"><div class="quien">Reto ${ri + 1} de ${m.retos.length}. ${esc(quien.nombre)}</div><p>${r.q}</p></div></div>
+      <div id="zona" class="zona"></div>
+      <div id="fb" class="fb" role="status" aria-live="polite"></div>
+      <div class="acciones"><span class="intentos" id="intentos"></span>
+        <button class="btn pri" id="btnRev">${r.tipo === 'build' ? 'Entregar pedido' : 'Revisar'}</button></div>
+    </section></main>`);
+  bindHud(); bindBar();
+  $('#btnManual').onclick = () => renderManual(mi, 0, ri);
+  TIPOS[r.tipo]($('#zona'), r);
+  pintaIntentos();
+  $('#btnRev').onclick = revisar;
+}
+function pintaIntentos(){
+  const e = $('#intentos'); if (!e) return;
+  if (R.done){ e.textContent = ''; return; }
+  const q = 3 - R.int;
+  e.textContent = R.int === 0 ? `Si lo resuelves al primer intento te pagan ${money(PTS[0])}` : `Te ${q === 1 ? 'queda 1 intento' : `quedan ${q} intentos`}`;
+}
+function fb(cls, html){ const e = $('#fb'); e.className = 'fb show ' + cls; e.innerHTML = html; }
+function info(t){ fb('info', esc(t)); }
+
+function revisar(){
+  if (!R || R.done) return;
+  const out = R.check();
+  if (!out) return;
+  R.int++; S.tries[R.r.id] = R.int;
+  if (out.ok) return terminar(true);
+  if (R.int >= 3){ if (R.reveal) R.reveal(); return terminar(false); }
+  SFX.bad();
+  const q = 3 - R.int;
+  fb('mal', `<b>Todavía no.</b> ${out.msg ? esc(out.msg) + ' ' : ''}Te ${q === 1 ? 'queda 1 intento' : `quedan ${q} intentos`}.<br><span class="pista">Pista: ${R.r.pista}</span>`);
+  pintaIntentos();
+  if (R.retry) R.retry();
+}
+
+function solucion(r){
+  switch (r.tipo){
+    case 'mcq': return r.ops[r.ok];
+    case 'match': return r.pares.map(([a, b]) => `${a}: ${b}`).join('. ');
+    case 'order': return r.items.join(', ');
+    case 'clasif': return r.cats.map((c, ci) => `${c}: ${r.items.filter(x => x[1] === ci).map(x => x[0]).join(', ')}`).join('. ');
+    case 'num': return `${String(r.ok).replace('.', ',')} ${r.unidad}`;
+    case 'build': return r.sol;
+    case 'mesa': return `abrir ${r.necesita.map(i => APPS[i][0]).join(', ')}`;
+    case 'zona': return PARTES.find(x => x[0] === r.ok)[1];
+  }
+  return '';
+}
+
+function terminar(ok){
+  R.done = true;
+  const pts = ok ? PTS[R.int - 1] : 0, m = MIS[R.mi], last = R.ri === m.retos.length - 1;
+  S.res[R.r.id] = { ok, i:R.int, p:pts };
+  $$('#zona button, #zona input').forEach(b => { b.disabled = true; });
+  if (ok){ SFX.ok(); fb('bien', `<b>¡Cliente feliz! Te pagaron ${money(pts)}.</b> ${R.r.exp}`); }
+  else { SFX.bad(); fb('fin', `<b>Este trabajo no se pagó, pero aprendiste algo.</b><span class="sol">La respuesta: ${solucion(R.r)}</span>${R.r.exp}`); }
+  $('#coins').textContent = money(monedas());
+  $('.dots').innerHTML = dotsHtml(R.mi, -1);
+  pintaIntentos();
+  S.pend.push({ mision:`M${R.mi + 1} ${m.titulo}`, reto:R.ri + 1, resultado: ok ? 'Correcto' : 'Incorrecto', intentos:R.int, monedas:pts, fecha:new Date().toISOString() });
+  S.ver++; guardar();
+  const b = $('#btnRev');
+  b.textContent = last ? 'Terminar misión' : 'Siguiente reto';
+  const mi = R.mi, ri = R.ri;
+  b.onclick = () => last ? renderCierre(mi) : renderReto(mi, ri + 1);
+  b.focus();
+}
+
+/* ---------- Tipos de reto ---------- */
+const COL = ['#00e5ff', '#ff2bd6', '#ffd166', '#38f59a', '#9d6bff', '#ff8a3d'];
+const TIPOS = {
+  mesa(z, r){ retoMesa(z, r); },
+  zona(z, r){ retoZona(z, r); },
+  mcq(z, r){
+    const orden = r.ops.length > 2 ? shuffle(r.ops.map((_, i) => i)) : r.ops.map((_, i) => i);
+    let sel = null;
+    z.innerHTML = `<div class="ops">${orden.map(i => `<button class="op" data-i="${i}">${r.ops[i]}</button>`).join('')}</div>`;
+    $$('.op', z).forEach(b => b.onclick = () => {
+      if (R.done) return; SFX.tap();
+      $$('.op', z).forEach(x => x.classList.remove('sel')); b.classList.add('sel'); sel = +b.dataset.i;
+    });
+    R.check = () => {
+      if (sel === null){ info('Elige una opción antes de revisar.'); return null; }
+      const b = $(`.op[data-i="${sel}"]`, z);
+      if (sel === r.ok){ b.classList.add('bien'); return { ok:true }; }
+      b.classList.remove('sel'); b.classList.add('mal'); b.disabled = true; sel = null;
+      return { ok:false };
+    };
+    R.reveal = () => $(`.op[data-i="${r.ok}"]`, z).classList.add('bien');
+  },
+
+  match(z, r){
+    const n = r.pares.length, der = shuffle(r.pares.map((_, i) => i)), pair = {}, fijo = new Set();
+    let selL = 0;
+    z.innerHTML = `<p class="ayuda">Toca un elemento de la izquierda y luego su pareja de la derecha. Para deshacer una pareja, tócala otra vez.</p>
+      <div class="match"><div class="col">${r.pares.map((p, i) => `<button class="mi" data-l="${i}"><span class="tag"></span>${p[0]}</button>`).join('')}</div>
+      <div class="col">${der.map(j => `<button class="mi" data-r="${j}"><span class="tag"></span>${r.pares[j][1]}</button>`).join('')}</div></div>`;
+    const libre = () => { for (let i = 0; i < n; i++) if (pair[i] == null && !fijo.has(i)) return i; return null; };
+    function pintar(){
+      const inv = {}; Object.keys(pair).forEach(i => { inv[pair[i]] = +i; });
+      $$('[data-l]', z).forEach(b => {
+        const i = +b.dataset.l, has = pair[i] != null;
+        b.classList.toggle('sel', selL === i && !has); b.classList.toggle('par', has); b.classList.toggle('bien', fijo.has(i));
+        b.style.setProperty('--c', COL[i % COL.length]); b.querySelector('.tag').textContent = i + 1;
+        b.setAttribute('aria-pressed', selL === i && !has);
+      });
+      $$('[data-r]', z).forEach(b => {
+        const j = +b.dataset.r, i = inv[j], has = i != null;
+        b.classList.toggle('par', has); b.classList.toggle('bien', has && fijo.has(i));
+        b.style.setProperty('--c', has ? COL[i % COL.length] : 'transparent'); b.querySelector('.tag').textContent = has ? i + 1 : '';
+      });
+    }
+    $$('[data-l]', z).forEach(b => b.onclick = () => {
+      if (R.done) return; const i = +b.dataset.l; if (fijo.has(i)) return; SFX.tap();
+      if (pair[i] != null) delete pair[i];
+      selL = i;
+      pintar();
+    });
+    $$('[data-r]', z).forEach(b => b.onclick = () => {
+      if (R.done) return; const j = +b.dataset.r;
+      const dueno = Object.keys(pair).find(k => pair[k] === j);
+      if (dueno != null){ if (fijo.has(+dueno)) return; delete pair[dueno]; selL = +dueno; SFX.tap(); pintar(); return; }
+      if (selL === null || pair[selL] != null){ info('Primero toca un elemento de la izquierda.'); return; }
+      pair[selL] = j; SFX.tap(); selL = libre(); pintar();
+    });
+    pintar();
+    R.check = () => {
+      if (Object.keys(pair).length < n){ info('Une todas las parejas antes de revisar.'); return null; }
+      let bien = 0;
+      Object.keys(pair).forEach(i => { if (pair[i] === +i){ fijo.add(+i); bien++; } });
+      if (bien === n){ pintar(); return { ok:true }; }
+      Object.keys(pair).forEach(i => { if (!fijo.has(+i)) delete pair[i]; });
+      selL = libre(); pintar();
+      return { ok:false, msg:`Tienes ${bien} de ${n} parejas bien; las correctas quedaron fijas.` };
+    };
+    R.reveal = () => { for (let i = 0; i < n; i++){ pair[i] = i; fijo.add(i); } selL = null; pintar(); };
+  },
+
+  order(z, r){
+    const n = r.items.length, slots = Array(n).fill(null), fijo = new Set();
+    let pool = shuffle(r.items.map((_, i) => i));
+    if (pool.every((v, i) => v === i)) pool.reverse();
+    function pintar(){
+      z.innerHTML = `<p class="ayuda">Toca los elementos en orden, empezando por el primero. Para quitar uno, tócalo en su casilla.</p>
+        <ol class="slots">${slots.map((v, k) => `<li><button class="slot ${v == null ? 'vacio' : ''} ${fijo.has(k) ? 'bien' : ''}" data-s="${k}" aria-label="Casilla ${k + 1}: ${v == null ? 'vacía' : esc(r.items[v])}"><span class="sn">${k + 1}</span>${v == null ? '' : r.items[v]}</button></li>`).join('')}</ol>
+        <div class="pool">${pool.map(v => `<button class="chip" data-v="${v}">${r.items[v]}</button>`).join('')}</div>`;
+      $$('.chip', z).forEach(b => b.onclick = () => {
+        if (R.done) return; const v = +b.dataset.v, k = slots.findIndex(x => x == null); if (k < 0) return;
+        SFX.tap(); slots[k] = v; pool = pool.filter(x => x !== v); pintar();
+        const sig = $('.chip', z) || $('#btnRev'); if (sig) sig.focus();
+      });
+      $$('.slot', z).forEach(b => b.onclick = () => {
+        if (R.done) return; const k = +b.dataset.s; if (fijo.has(k) || slots[k] == null) return;
+        SFX.tap(); pool.push(slots[k]); slots[k] = null; pintar();
+      });
+    }
+    pintar();
+    R.check = () => {
+      if (slots.some(x => x == null)){ info('Ubica todos los elementos antes de revisar.'); return null; }
+      let bien = 0;
+      slots.forEach((v, k) => { if (v === k){ fijo.add(k); bien++; } });
+      if (bien === n){ pintar(); return { ok:true }; }
+      slots.forEach((v, k) => { if (!fijo.has(k)){ pool.push(v); slots[k] = null; } });
+      pintar();
+      return { ok:false, msg:`${bien} de ${n} quedaron en su lugar y se quedan fijos.` };
+    };
+    R.reveal = () => { for (let k = 0; k < n; k++){ slots[k] = k; fijo.add(k); } pool = []; pintar(); };
+  },
+
+  clasif(z, r){
+    const n = r.items.length, orden = shuffle(r.items.map((_, i) => i)), resp = {}, fijo = new Set(), mal = new Set();
+    z.innerHTML = `<div class="clasif">${orden.map(i => `<div class="fila" data-f="${i}"><span class="fila-t">${r.items[i][0]}</span>
+      <span class="seg" role="group" aria-label="${esc(r.items[i][0])}">${r.cats.map((c, ci) => `<button data-i="${i}" data-c="${ci}" aria-pressed="false">${c}</button>`).join('')}</span></div>`).join('')}</div>`;
+    function pintar(){
+      $$('.fila', z).forEach(f => {
+        const i = +f.dataset.f;
+        f.classList.toggle('bien', fijo.has(i)); f.classList.toggle('mal', mal.has(i));
+        $$('button', f).forEach(b => { const s = resp[i] === +b.dataset.c; b.classList.toggle('sel', s); b.setAttribute('aria-pressed', s); });
+      });
+    }
+    $$('.seg button', z).forEach(b => b.onclick = () => {
+      if (R.done) return; const i = +b.dataset.i; if (fijo.has(i)) return;
+      SFX.tap(); resp[i] = +b.dataset.c; mal.delete(i); pintar();
+    });
+    R.check = () => {
+      if (Object.keys(resp).length < n){ info('Clasifica todos los elementos antes de revisar.'); return null; }
+      let bien = 0;
+      for (let i = 0; i < n; i++){ if (resp[i] === r.items[i][1]){ fijo.add(i); bien++; } else { mal.add(i); } }
+      if (bien === n){ pintar(); return { ok:true }; }
+      for (let i = 0; i < n; i++) if (!fijo.has(i)) delete resp[i];
+      pintar();
+      return { ok:false, msg:`${bien} de ${n} están bien. Revisa los que quedaron en rojo.` };
+    };
+    R.reveal = () => { for (let i = 0; i < n; i++){ resp[i] = r.items[i][1]; fijo.add(i); } mal.clear(); pintar(); };
+  },
+
+  num(z, r){
+    z.innerHTML = `<label class="num"><input id="numIn" type="text" inputmode="decimal" autocomplete="off" aria-label="Tu respuesta"><span>${r.unidad}</span></label>`;
+    const inp = $('#numIn', z);
+    inp.onkeydown = e => { if (e.key === 'Enter'){ e.preventDefault(); revisar(); } };
+    inp.oninput = () => inp.classList.remove('mal');
+    inp.focus();
+    R.check = () => {
+      const v = inp.value.trim().replace(/\s/g, '').replace(',', '.');
+      if (v === '' || isNaN(Number(v))){ info('Escribe un número antes de revisar (puedes usar coma para los decimales).'); return null; }
+      if (Math.abs(Number(v) - r.ok) <= (r.tol || 0)){ inp.classList.add('bien'); return { ok:true }; }
+      inp.classList.add('mal'); return { ok:false };
+    };
+    R.retry = () => inp.select();
+    R.reveal = () => { inp.value = String(r.ok).replace('.', ','); inp.classList.remove('mal'); inp.classList.add('bien'); };
+  },
+
+  build(z, r){
+    const GR = r.grupos, sel = {};
+    GR.forEach(([k]) => { sel[k] = null; });
+    let estReq = null;
+    const total = () => r.base + GR.reduce((s, [k]) => s + (sel[k] != null ? CAT[k][sel[k]].p : 0), 0);
+    const piezas = () => { const s = { total:total() }; GR.forEach(([k]) => { s[k] = CAT[k][sel[k]]; }); return s; };
+    function pintar(){
+      const t = total(), sobra = r.presupuesto - t;
+      z.innerHTML = `<div class="build">
+        <div>${GR.map(([k, lab]) => `<fieldset class="grupo"><legend>${lab}</legend><div class="cards">${CAT[k].map((o, i) =>
+          `<button class="pieza ${sel[k] === i ? 'sel' : ''}" data-k="${k}" data-i="${i}" aria-pressed="${sel[k] === i}"><b>${o.n}</b>${o.d ? `<small>${o.d}</small>` : ''}<span class="precio">${money(o.p)}</span></button>`).join('')}</div></fieldset>`).join('')}</div>
+        <aside class="resumen" aria-live="polite"><h3>Orden de trabajo</h3>
+          <div class="linea"><span>${r.baseTxt}</span><b>${money(r.base)}</b></div>
+          ${GR.map(([k, lab]) => `<div class="linea"><span>${lab}: ${sel[k] != null ? CAT[k][sel[k]].n : 'sin elegir'}</span><b>${sel[k] != null ? money(CAT[k][sel[k]].p) : '—'}</b></div>`).join('')}
+          <div class="linea total ${sobra < 0 ? 'pasado' : ''}"><span>Total</span><b>${money(t)}</b></div>
+          <div class="linea"><span>Presupuesto del cliente</span><b>${money(r.presupuesto)}</b></div>
+          <div class="linea ${sobra < 0 ? 'pasado' : ''}"><span>${sobra < 0 ? 'Te pasaste por' : 'Le sobra'}</span><b>${money(Math.abs(sobra))}</b></div>
+          <h4>Lo que pide ${esc(r.cli.nombre)}</h4>
+          <ul class="reqs">${r.reqs.map((q, qi) => `<li class="${estReq ? (estReq[qi] ? 'ok' : 'no') : ''}">${q.t}</li>`).join('')}</ul>
+        </aside></div>`;
+      $$('.pieza', z).forEach(b => b.onclick = () => {
+        if (R.done) return; SFX.tap(); sel[b.dataset.k] = +b.dataset.i; estReq = null; pintar();
+        const f = $(`.pieza[data-k="${b.dataset.k}"][data-i="${b.dataset.i}"]`, z); if (f) f.focus();
+      });
+    }
+    pintar();
+    R.check = () => {
+      if (GR.some(([k]) => sel[k] == null)){ info('Elige una opción en cada sección del catálogo antes de entregar.'); return null; }
+      const s = piezas(); estReq = r.reqs.map(q => q.f(s)); pintar();
+      const b = estReq.filter(Boolean).length;
+      return b === r.reqs.length ? { ok:true } : { ok:false, msg:`El pedido cumple ${b} de ${r.reqs.length} cosas que pidió ${r.cli.nombre}. Mira la lista en la orden de trabajo.` };
+    };
+    R.reveal = () => { Object.assign(sel, r.solSel); const s = piezas(); estReq = r.reqs.map(q => q.f(s)); pintar(); };
+  }
+};
+
+/* ---------- Fin de misión ---------- */
+function renderCierre(mi){
+  const m = MIS[mi], max = m.retos.length * PTS[0];
+  const pts = m.retos.reduce((s, r) => s + ((S.res[r.id] || {}).p || 0), 0);
+  const bien = m.retos.filter(r => (S.res[r.id] || {}).ok).length;
+  const ultima = mi === MIS.length - 1, todo = !posActual();
+  pantalla(hud() + `<main class="wrap">${barMision(mi, -1)}
+    <section class="escena"><div>${avatar(m.cli)}</div>
+      <div class="burbuja"><div class="quien">${esc(m.cli.nombre)}</div><p>${m.gracias}</p></div></section>
+    <div class="stats">
+      <div class="stat"><b>${bien} de ${m.retos.length}</b><span>retos resueltos bien</span></div>
+      <div class="stat"><b>${money(pts)}</b><span>ganados de ${money(max)} posibles</span></div>
+    </div>
+    <div class="acciones">
+      <button class="btn" id="btnVolver">Volver a la tienda</button>
+      ${ultima || todo ? '<button class="btn pri" id="btnFinal">Ver mi resultado final</button>' : `<button class="btn pri" id="btnSig">Siguiente misión: ${esc(MIS[mi + 1].titulo)}</button>`}
+    </div></main>`);
+  bindHud(); bindBar();
+  SFX.win();
+  $('#btnVolver').onclick = renderHub;
+  const f = $('#btnFinal'), s = $('#btnSig');
+  if (f){ f.onclick = renderFinal; f.focus(); }
+  if (s){ s.onclick = () => abrirMision(mi + 1); s.focus(); }
+}
+
+/* ---------- Resultado final ---------- */
+function renderFinal(){
+  const sal = monedas(), n = nota(), t = NOTAS.find(x => x.n === n);
+  pantalla(hud() + `<main class="wrap">
+    <section class="cert">
+      <h1>Tienda de notas</h1>
+      <p style="color:var(--mu)">${esc(S.nombre)}, terminaste el Laboratorio RAM. Con tu salario puedes comprar la mejor nota que te alcance.</p>
+      <div class="stats">
+        <div class="stat"><b>${money(ganadas())}</b><span>salario ganado</span></div>
+        ${S.penal ? `<div class="stat"><b>−${money(S.penal)}</b><span>descuentos por ${S.faltas} ${S.faltas === 1 ? 'salida' : 'salidas'}</span></div>` : ''}
+        <div class="stat"><b>${money(sal)}</b><span>disponible para comprar</span></div>
+      </div>
+      <div class="precios">${NOTAS.map(x => `<div class="precio-nota ${sal >= x.precio ? 'alcanza' : ''} ${t && x.n === n ? 'mejor' : ''}"><b>${fmtNota(x.n)}</b><span>${money(x.precio)}</span></div>`).join('')}</div>
+      <div id="compra" class="acciones" style="justify-content:center">${t
+        ? `<button class="btn pri" id="btnComprar">Comprar mi ${fmtNota(n)} por ${money(t.precio)}</button>`
+        : `<p class="aviso">Tu salario no alcanza para el 3,0, que cuesta ${money(NOTAS[NOTAS.length - 1].precio)}.</p><button class="btn pri" id="btnComprar">Ver mi nota</button>`}</div>
+      <div id="factura"></div>
+    </section>
+    <div class="acciones" style="justify-content:center"><button class="btn" id="btnVolver">Volver a la tienda</button></div></main>`);
+  bindHud();
+  $('#btnVolver').onclick = renderHub;
+  $('#btnComprar').onclick = () => {
+    SFX.win();
+    $('#compra').remove();
+    $('#factura').innerHTML = `
+      <div class="nombre">${esc(S.nombre)}</div><div style="color:var(--mu)">${esc(S.curso)}</div>
+      <div class="nota" aria-label="Nota ${notaTxt()}">${notaTxt()}</div>
+      <div class="rango">${t ? 'Nota comprada. ' : 'No alcanzó para aprobar. '}${rango(n)}</div>
+      ${t ? `<p style="color:var(--mu)">Pagaste ${money(t.precio)}. Te sobran ${money(sal - t.precio)}.</p>` : ''}
+      <div class="stats"><div class="stat"><b>${correctos()} de ${TOTAL}</b><span>retos resueltos bien</span></div></div>
+      <div class="tabla-wrap"><table class="tabla"><thead><tr><th>Misión</th><th>Bien</th><th>Salario</th></tr></thead><tbody>
+        ${MIS.map((m, mi) => `<tr><td>${mi + 1}. ${esc(m.titulo)}</td><td>${m.retos.filter(r => (S.res[r.id] || {}).ok).length} de ${m.retos.length}</td><td>${money(m.retos.reduce((s2, r) => s2 + ((S.res[r.id] || {}).p || 0), 0))}</td></tr>`).join('')}
+      </tbody></table></div>`;
+  };
+}
+
+/* ---------- Vigilancia ---------- */
+let lejos = null;
+const vigilando = () => VIG.activa && !!S.user && !S.pausaVig && posActual() !== null;
+function seFue(){ if (lejos === null && vigilando()) lejos = Date.now(); }
+function volvio(){
+  if (lejos === null || document.visibilityState !== 'visible' || !document.hasFocus()) return;
+  const seg = (Date.now() - lejos) / 1000; lejos = null;
+  if (seg >= VIG.segundosMinimos && vigilando()) registrarSalida(seg);
+}
+document.addEventListener('visibilitychange', () => { if (document.hidden) seFue(); else volvio(); });
+window.addEventListener('blur', seFue);
+window.addEventListener('focus', volvio);
+
+function registrarSalida(seg){
+  S.faltas++; S.racha++; S.penal += VIG.penalMonedas;
+  if (S.racha >= VIG.maxSalidas) S.bloq = true;
+  S.pend.push({ mision:'Vigilancia', reto:'', resultado:`Salió de la actividad (${Math.round(seg)} s)${S.bloq ? ' y quedó bloqueada' : ''}`, intentos:S.faltas, monedas:-VIG.penalMonedas, fecha:new Date().toISOString() });
+  S.ver++; guardar();
+  const c = $('#coins'); if (c) c.textContent = money(monedas());
+  const h = $('#hudSal'); if (h){ h.textContent = `Salidas: ${S.faltas}`; h.classList.add('alerta'); }
+  SFX.bad();
+  mostrarBloqueo(seg);
+}
+
+function mostrarBloqueo(seg){
+  let o = $('#bloqueo');
+  if (!o){ o = document.createElement('div'); o.id = 'bloqueo'; o.setAttribute('role', 'alertdialog'); o.setAttribute('aria-modal', 'true'); document.body.appendChild(o); }
+  clearInterval(S.bloqT);
+  if (S.bloq){
+    o.innerHTML = `<div class="bloq-card"><div class="bloq-ico">!</div><h2>Actividad bloqueada</h2>
+      <p>Saliste de la actividad ${S.faltas} ${S.faltas === 1 ? 'vez' : 'veces'}. Quedó registrado en la hoja de la profe.</p>
+      <p>Llama a la profe para que la desbloquee.</p>
+      <input id="clProfe" type="password" inputmode="numeric" autocomplete="off" aria-label="Clave de la profe" placeholder="Clave de la profe">
+      <p class="bloq-msg" id="bmsg" role="status"></p>
+      <button class="btn pri" id="btnDesb">Desbloquear</button></div>`;
+    const inp = $('#clProfe'), ok = () => {
+      if (inp.value.trim() !== VIG.claveProfe){ $('#bmsg').textContent = 'Clave incorrecta.'; inp.select(); return; }
+      S.bloq = false; S.racha = 0;
+      S.pend.push({ mision:'Vigilancia', reto:'', resultado:'Desbloqueada por la profe', intentos:S.faltas, monedas:0, fecha:new Date().toISOString() });
+      S.ver++; guardar(); o.remove();
+    };
+    $('#btnDesb').onclick = ok;
+    inp.onkeydown = e => { if (e.key === 'Enter'){ e.preventDefault(); ok(); } };
+    inp.focus();
+    return;
+  }
+  let t = VIG.esperaSeg;
+  o.innerHTML = `<div class="bloq-card"><div class="bloq-ico">!</div><h2>Saliste de la actividad</h2>
+    <p>Estuviste fuera ${Math.round(seg)} segundos. Quedó registrado en la hoja de la profe y te descontaron <b>${money(VIG.penalMonedas)}</b> del salario.</p>
+    <p>Salidas: <b>${S.racha} de ${VIG.maxSalidas}</b>. Al llegar a ${VIG.maxSalidas}, la actividad se bloquea.</p>
+    <button class="btn pri" id="btnVolverAct" disabled>Podrás seguir en ${t} s</button></div>`;
+  const b = $('#btnVolverAct');
+  S.bloqT = setInterval(() => {
+    t--;
+    if (t > 0){ b.textContent = `Podrás seguir en ${t} s`; return; }
+    clearInterval(S.bloqT); b.disabled = false; b.textContent = 'Volver a la actividad'; b.focus();
+  }, 1000);
+  b.onclick = () => o.remove();
+}
+
+renderLogin();
+</script>
+</body>
+</html>
